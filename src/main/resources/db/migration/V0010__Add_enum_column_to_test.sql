@@ -1,0 +1,1 @@
+alter table public.test add column enum test_enum not null default ('yes');

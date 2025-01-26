@@ -7,7 +7,7 @@
 <body>
 
 <div th:each="test: ${tests}">
-    <a th:text="${test.getName() + ', ' + test.isValue()}">test</a>
+    <a th:text="${test.getName() + ', ' + test.isValue() + ', ' + test.enumValue}">test</a>
 
     <form th:method="GET" th:action="@{/tests/{id}/edit(id=${test.getId()})}">
         <input type="submit" value="Edit"/>

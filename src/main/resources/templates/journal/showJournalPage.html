@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Show journal page</title>
+</head>
+<body>
+
+<div th:each="article: ${journalArticles}">
+    <a th:text="${article.getName() + ', ' + article.getTopic() + ', ' + article.getPages() +
+    ', ' + article.getFirstPage() + ', ' + article.getLastPage() +
+    ', ' + article.getChiefEditor() + ', ' + article.getScienceEditor() +
+    ', ' + article.getAuthorCoordination() + ', ' + article.getCorrector() +
+    ', ' + article.getPageProofs() + ', ' + article.getDummy()}">article</a>
+
+    <form th:method="POST" th:action="@{/publisher/{jornalId}/{articleId}/edit(jornalId=${article.getJournal().getId()},
+    articleId=${article.getId()})}" th:object="${article}">
+        <label for="name">Enter name: </label>
+        <input type="text" th:field="*{name}" id="name"/>
+        <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</div>
+        <br/>
+        <input type="submit" value="Edit!"/>
+    </form>
+
+    <form th:method="POST" th:action="@{/publisher/{jornalId}/{articleId}/edit(jornalId=${article.getJournal().getId()},
+    articleId=${article.getId()})}" th:object="${article}">
+        <label for="topic">Enter topic: </label>
+        <input type="text" th:field="*{topic}" id="topic"/>
+        <div style="color:red" th:if="${#fields.hasErrors('topic')}" th:errors="*{topic}">Topic Error</div>
+        <br/>
+        <input type="submit" value="Edit!"/>
+    </form>
+
+    <form th:method="POST" th:action="@{/publisher/{jornalId}/{articleId}/edit(jornalId=${article.getJournal().getId()},
+    articleId=${article.getId()})}" th:object="${article}">
+        <label for="pages">Enter number of pages: </label>
+        <input type="text" th:field="*{pages}" id="pages"/>
+        <div style="color:red" th:if="${#fields.hasErrors('pages')}" th:errors="*{pages}">Pages Error</div>
+        <br/>
+        <input type="submit" value="Edit!"/>
+    </form>
+
+    <form th:method="POST" th:action="@{/publisher/publisher/{jornalId}/{articleId}/edit(jornalId=${article.getJournal().getId()},
+    articleId=${article.getId()})}" th:object="${article}">
+        <label for="firstPage">Enter first page number: </label>
+        <input type="text" th:field="*{firstPage}" id="firstPage"/>
+        <div style="color:red" th:if="${#fields.hasErrors('firstPage')}" th:errors="*{firstPage}"> First Page Error</div>
+        <br/>
+        <input type="submit" value="Edit!"/>
+    </form>
+
+    <form th:method="POST" th:action="@{/publisher/publisher/{jornalId}/{articleId}/edit(jornalId=${article.getJournal().getId()},
+    articleId=${article.getId()})}" th:object="${article}">
+        <label for="lastPage">Enter last page number: </label>
+        <input type="text" th:field="*{lastPage}" id="lastPage"/>
+        <div style="color:red" th:if="${#fields.hasErrors('lastPage')}" th:errors="*{lastPage}"> Last Page Error</div>
+        <br/>
+        <input type="submit" value="Edit!"/>
+    </form>
+
+    <form th:method="POST" th:action="@{/publisher/{jornalId}/{articleId}/edit(jornalId=${article.getJournal().getId()},
+    articleId=${article.getId()})}" th:object="${article}">
+        <label for="chiefEditor">Enter chief editor state: </label>
+        <input type="text" th:field="*{chiefEditor}" id="chiefEditor"/>
+        <div style="color:red" th:if="${#fields.hasErrors('chiefEditor')}" th:errors="*{chiefEditor}"> Error</div>
+        <br/>
+        <input type="submit" value="Edit!"/>
+    </form>
+
+    <form th:method="POST" th:action="@{/publisher/{jornalId}/{articleId}/edit(jornalId=${article.getJournal().getId()},
+    articleId=${article.getId()})}" th:object="${article}">
+        <label for="scienceEditor">Enter science editor state: </label>
+        <input type="text" th:field="*{scienceEditor}" id="scienceEditor"/>
+        <div style="color:red" th:if="${#fields.hasErrors('scienceEditor')}" th:errors="*{scienceEditor}">Science editor Error</div>
+        <br/>
+        <input type="submit" value="Edit!"/>
+    </form>
+
+    <form th:method="POST" th:action="@{/publisher/{jornalId}/{articleId}/edit(jornalId=${article.getJournal().getId()},
+    articleId=${article.getId()})}" th:object="${article}">
+        <label for="authorCoordination">Enter author coordination state: </label>
+        <input type="text" th:field="*{authorCoordination}" id="authorCoordination"/>
+        <div style="color:red" th:if="${#fields.hasErrors('authorCoordination')}" th:errors="*{authorCoordination}"> Author coordination Error</div>
+        <br/>
+        <input type="submit" value="Edit!"/>
+    </form>
+
+    <form th:method="POST" th:action="@{/publisher/{jornalId}/{articleId}/edit(jornalId=${article.getJournal().getId()},
+    articleId=${article.getId()})}" th:object="${article}">
+        <label for="corrector">Enter corrector state: </label>
+        <input type="text" th:field="*{corrector}" id="corrector"/>
+        <div style="color:red" th:if="${#fields.hasErrors('corrector')}" th:errors="*{corrector}">Error</div>
+        <br/>
+        <input type="submit" value="Edit!"/>
+    </form>
+
+    <form th:method="POST" th:action="@{/publisher/{jornalId}/{articleId}/edit(jornalId=${article.getJournal().getId()},
+    articleId=${article.getId()})}" th:object="${article}">
+        <label for="pageProofs">Enter page proofs state: </label>
+        <input type="text" th:field="*{pageProofs}" id="pageProofs"/>
+        <div style="color:red" th:if="${#fields.hasErrors('pageProofs')}" th:errors="*{pageProofs}">Error</div>
+        <br/>
+        <input type="submit" value="Edit!"/>
+    </form>
+
+    <form th:method="POST" th:action="@{/publisher/{jornalId}/{articleId}/edit(jornalId=${article.getJournal().getId()},
+    articleId=${article.getId()})}" th:object="${article}">
+        <label for="dummy">Enter dummy state: </label>
+        <input type="text" th:field="*{dummy}" id="dummy"/>
+        <div style="color:red" th:if="${#fields.hasErrors('dummy')}" th:errors="*{dummy}"> Error</div>
+        <br/>
+        <input type="submit" value="Edit!"/>
+    </form>
+
+    <form th:method="DELETE" th:action="@{/publisher/{jornalId}/{articleId}(jornalId=${article.getJournal().getId()},
+    articleId=${article.getId()})}">
+        <input type="submit" value="Delete"/>
+    </form>
+</div>
+
+<form th:method="GET" th:action="@{/publisher/{jornalId}/new (jornalId=${journalArticles.getFirst().getJournal().getId()})}">
+    <input type="submit" value="New"/>
+</form>
+
+</body>
+</html>

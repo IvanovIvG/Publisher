@@ -3,6 +3,8 @@ package ru.ivanov.Publisher.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 /**
  * @author Ivan Ivanov
@@ -22,6 +24,11 @@ public class Test {
 
     @Column(name = "value")
     private boolean value;
+
+    @Column(name = "enum")
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    private TestEnum enumValue;
 
     public Test() {
 
@@ -54,5 +61,13 @@ public class Test {
 
     public void setValue(boolean value) {
         this.value = value;
+    }
+
+    public TestEnum getEnumValue() {
+        return enumValue;
+    }
+
+    public void setEnumValue(TestEnum enumValue) {
+        this.enumValue = enumValue;
     }
 }
