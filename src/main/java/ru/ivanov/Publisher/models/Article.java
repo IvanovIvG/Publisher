@@ -51,32 +51,32 @@ public class Article {
     @Column(name = "chief_editor_stage")
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    private FourStateStage chiefEditor = FourStateStage.NotReadyAndOrdered;
+    private FourStateStage chiefEditor = FourStateStage.Not_Ready_And_In_Stock;
 
     @Column(name = "science_editor")
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    private ThreeStateStage scienceEditor = ThreeStateStage.NotReady;
+    private ThreeStateStage scienceEditor = ThreeStateStage.Not_Ready;
 
     @Column(name = "author_coordination")
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    private ThreeStateStage authorCoordination = ThreeStateStage.NotReady;
+    private ThreeStateStage authorCoordination = ThreeStateStage.Not_Ready;
 
     @Column(name = "corrector")
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    private ThreeStateStage corrector = ThreeStateStage.NotReady;
+    private ThreeStateStage corrector = ThreeStateStage.Not_Ready;
 
     @Column(name = "page_proofs")
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    private TwoStateStage pageProofs = TwoStateStage.NotReady;
+    private TwoStateStage pageProofs = TwoStateStage.Not_Ready;
 
     @Column(name = "dummy")
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    private TwoStateStage dummy = TwoStateStage.NotReady;
+    private TwoStateStage dummy = TwoStateStage.Not_Ready;
 
     public Article() {
     }
