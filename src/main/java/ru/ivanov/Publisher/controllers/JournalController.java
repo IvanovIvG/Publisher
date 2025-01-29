@@ -1,20 +1,15 @@
 package ru.ivanov.Publisher.controllers;
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.ivanov.Publisher.assemblers.ArticleModelAssembler;
 import ru.ivanov.Publisher.models.Article;
-import ru.ivanov.Publisher.models.Journal;
 import ru.ivanov.Publisher.services.ArticleService;
-import ru.ivanov.Publisher.services.JournalService;
 
 import java.util.List;
 
