@@ -27,8 +27,8 @@ public class ArticleService {
     }
 
     @Transactional
-    public void create(Article article) {
-        articleRepository.save(article);
+    public Article create(Article article) {
+        return articleRepository.save(article);
     }
 
     public Article readById(int id) {
@@ -46,11 +46,12 @@ public class ArticleService {
     }
 
     @Transactional
-    public void update(Article article) {
+    public Article update(Article article) {
         Optional<Article> articleWithSameId = articleRepository.findById(article.getId());
         if (articleWithSameId.isPresent()) {
-            articleRepository.save(article);
+            return articleRepository.save(article);
         }
+        return article;
     }
 
     @Transactional

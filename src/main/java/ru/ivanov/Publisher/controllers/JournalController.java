@@ -2,16 +2,24 @@ package ru.ivanov.Publisher.controllers;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.ivanov.Publisher.assemblers.ArticleModelAssembler;
 import ru.ivanov.Publisher.models.Article;
 import ru.ivanov.Publisher.models.Journal;
 import ru.ivanov.Publisher.services.ArticleService;
 import ru.ivanov.Publisher.services.JournalService;
 
 import java.util.List;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author Ivan Ivanov
@@ -20,57 +28,45 @@ import java.util.List;
 @RequestMapping("/publisher/{journalId}")
 public class JournalController {
     private final ArticleService articleService;
-    private final JournalService journalService;
+    private final ArticleModelAssembler assembler;
 
     @Autowired
-    public JournalController(ArticleService articleService, JournalService journalService) {
+    public JournalController(ArticleService articleService, ArticleModelAssembler assembler) {
         this.articleService = articleService;
-        this.journalService = journalService;
-    }
-
-    @ModelAttribute
-    public void getJournal(@PathVariable int journalId, Model model){
-        Journal journal = journalService.readById(journalId);
-        model.addAttribute("journal", journal);
+        this.assembler = assembler;
     }
 
     @GetMapping()
-    public String showArticles(@PathVariable int journalId, Model model){
-        List<Article> articles = articleService.readAllByJournal(journalId);
-        model.addAttribute("articles", articles);
-        return "journal/showJournalPage";
-    }
+    public ResponseEntity<?> showArticles(@PathVariable int journalId){
+        List<EntityModel<Article>> articles = articleService.readAllByJournal(journalId).stream()
+                .map(assembler::toModel)
+                .toList();
 
-    @GetMapping("/new")
-    public String goToNewArticleCreationPage(@ModelAttribute("newArticle") Article newArticle, @PathVariable int journalId) {
-        newArticle.setJournal(journalService.readById(journalId));
-        return "journal/newArticle";
+        CollectionModel<EntityModel<Article>> articleCollectionModel = CollectionModel.of(articles,
+                linkTo(methodOn(JournalController.class).showArticles(journalId)).withSelfRel());
+
+        return ResponseEntity.ok(articleCollectionModel);
     }
 
     @PostMapping()
-    public String createArticle(@ModelAttribute("newArticle") @Valid Article newArticle,
-                                BindingResult bindingResult) {
-        if (bindingResult.hasErrors())
-            return "journal/newArticle";
-
-        articleService.create(newArticle);
-        return "redirect:/publisher/{journalId}";
+    public ResponseEntity<?> createArticle(@RequestBody Article newArticle) {
+        Article createdArticle = articleService.create(newArticle);
+        EntityModel<Article> articleEntityModel = assembler.toModel(createdArticle);
+        return new ResponseEntity<>(articleEntityModel, HttpStatus.CREATED);
     }
 
     @PatchMapping("/{articleId}/edit")
-    public String updateJournal(@PathVariable("articleId") int articleId,
-                                    @ModelAttribute("article") @Valid Article articleToUpdate,
-                                    BindingResult bindingResult) {
-        if (bindingResult.hasErrors())
-            return "journal/showJournalPage";
-
-        articleService.update(articleToUpdate);
-        return "redirect:/publisher/{journalId}";
+    public ResponseEntity<?> updateJournal(@PathVariable("articleId") int articleId,
+                                    @RequestBody Article articleToUpdate) {
+        articleToUpdate.setId(articleId);
+        Article updatedArticle = articleService.update(articleToUpdate);
+        EntityModel<Article> articleEntityModel = assembler.toModel(updatedArticle);
+        return ResponseEntity.ok(articleEntityModel);
     }
 
     @DeleteMapping("/{articleId}")
-    public String delete(@PathVariable("articleId") int articleId) {
+    public ResponseEntity<?> deleteArticle(@PathVariable("articleId") int articleId) {
         articleService.delete(articleId);
-        return "redirect:/publisher/{journalId}";
+        return ResponseEntity.ok().build();
     }
 }

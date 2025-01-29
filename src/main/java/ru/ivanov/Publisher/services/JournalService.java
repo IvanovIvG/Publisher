@@ -24,8 +24,8 @@ public class JournalService {
     }
 
     @Transactional
-    public void create(Journal journal) {
-        journalRepository.save(journal);
+    public Journal create(Journal journal) {
+        return journalRepository.save(journal);
     }
 
     public Journal readById(int id) {
@@ -38,11 +38,12 @@ public class JournalService {
     }
 
     @Transactional
-    public void update(Journal journal) {
+    public Journal update(Journal journal) {
         Optional<Journal> journalWithSameId = journalRepository.findById(journal.getId());
         if (journalWithSameId.isPresent()) {
-            journalRepository.save(journal);
+            return journalRepository.save(journal);
         }
+        return journal;
     }
 
     @Transactional

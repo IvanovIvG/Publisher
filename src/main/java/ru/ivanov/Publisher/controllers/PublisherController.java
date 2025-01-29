@@ -2,64 +2,71 @@ package ru.ivanov.Publisher.controllers;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.ivanov.Publisher.assemblers.JournalModelAssembler;
 import ru.ivanov.Publisher.models.Journal;
 import ru.ivanov.Publisher.services.JournalService;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author Ivan Ivanov
  **/
-@Controller
+@RestController
 @RequestMapping("/publisher")
 public class PublisherController {
     private final JournalService journalService;
+    private final JournalModelAssembler assembler;
 
     @Autowired
-    public PublisherController(JournalService journalService) {
+    public PublisherController(JournalService journalService, JournalModelAssembler assembler) {
         this.journalService = journalService;
+        this.assembler = assembler;
     }
 
     @GetMapping()
-    public String showAllJournals(Model model){
-        List<Journal> journals = journalService.readAll();
-        model.addAttribute("allJournals", journals);
-        return "publisher/allJournals";
-    }
+    public ResponseEntity<?> showAllJournals(){
+        List<EntityModel<Journal>> journals = journalService.readAll().stream()
+                .map(assembler::toModel)
+                .toList();
 
-    @GetMapping("/new")
-    public String goToNewJournalCreationPage(@ModelAttribute("newJournal") Journal journal) {
-        return "publisher/createJournal";
+        CollectionModel<EntityModel<Journal>> journalCollectionModel = CollectionModel.of(journals,
+                linkTo(methodOn(PublisherController.class).showAllJournals()).withSelfRel());
+
+        return ResponseEntity.ok(journalCollectionModel);
     }
 
     @PostMapping()
-    public String createJournal(@ModelAttribute("newJournal") @Valid Journal newJournal,
-                             BindingResult bindingResult) {
-        if (bindingResult.hasErrors())
-            return "publisher/createJournal";
-
-        journalService.create(newJournal);
-        return "redirect:/publisher";
+    public ResponseEntity<?> createJournal(@RequestBody Journal newJournal) {
+        Journal createdJournal = journalService.create(newJournal);
+        EntityModel<Journal> journalEntityModel = assembler.toModel(createdJournal);
+        return new ResponseEntity<>(journalEntityModel, HttpStatus.CREATED);
     }
 
     @PatchMapping("/{journalId}/edit")
-    public String updateJournal(@PathVariable("journalId") int journalId,
-                                    @ModelAttribute("journalToUpdate") @Valid Journal journalToUpdate,
-                                    BindingResult bindingResult) {
-        if (bindingResult.hasErrors())
-            return "publisher/allJournals";
-
-        journalService.update(journalToUpdate);
-        return "redirect:/publisher";
+    public ResponseEntity<?> updateJournal(@PathVariable("journalId") int journalId,
+                                    @RequestBody Journal journalToUpdate) {
+        journalToUpdate.setId(journalId);
+        Journal updatedJournal = journalService.update(journalToUpdate);
+        EntityModel<Journal> journalEntityModel = assembler.toModel(updatedJournal);
+        return ResponseEntity.ok(journalEntityModel);
     }
 
     @DeleteMapping("/{journalId}")
-    public String deleteJournal(@PathVariable("journalId") int journalId) {
+    public ResponseEntity<?> deleteJournal(@PathVariable("journalId") int journalId) {
         journalService.delete(journalId);
-        return "redirect:/publisher";
+        return ResponseEntity.ok().build();
     }
 }
