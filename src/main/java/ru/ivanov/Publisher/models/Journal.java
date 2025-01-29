@@ -3,6 +3,7 @@ package ru.ivanov.Publisher.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +13,15 @@ import java.util.List;
  **/
 @Entity
 @Table(name = "journals")
+@NoArgsConstructor
+@ToString
+@EqualsAndHashCode
 public class Journal {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
+    @Setter
     private int id;
 
     @OneToMany(mappedBy="journal", cascade = CascadeType.REMOVE)
@@ -24,25 +30,7 @@ public class Journal {
     @Column(name = "name")
     @NotEmpty(message = "Name must not be empty")
     @Size(min = 1, max = 100, message = "Name must be from 1 to 100 length")
+    @Getter
+    @Setter
     private String name;
-
-
-    public Journal() {
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public @NotEmpty(message = "Name must not be empty") @Size(min = 1, max = 100, message = "Name must be from 1 to 100 length") String getName() {
-        return name;
-    }
-
-    public void setName(@NotEmpty(message = "Name must not be empty") @Size(min = 1, max = 100, message = "Name must be from 1 to 100 length") String name) {
-        this.name = name;
-    }
 }
