@@ -1,14 +1,18 @@
 package ru.ivanov.Publisher.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.ivanov.Publisher.assemblers.ArticleModelAssembler;
 import ru.ivanov.Publisher.models.Article;
+import ru.ivanov.Publisher.models.validationGroups.OnCreate;
+import ru.ivanov.Publisher.models.validationGroups.OnUpdate;
 import ru.ivanov.Publisher.services.ArticleService;
 
 import java.util.List;
@@ -20,16 +24,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * @author Ivan Ivanov
  **/
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/publisher/{journalId}")
+@Validated
 public class JournalController {
     private final ArticleService articleService;
     private final ArticleModelAssembler assembler;
-
-    @Autowired
-    public JournalController(ArticleService articleService, ArticleModelAssembler assembler) {
-        this.articleService = articleService;
-        this.assembler = assembler;
-    }
 
     @GetMapping()
     public ResponseEntity<?> showArticles(@PathVariable int journalId){
@@ -44,16 +44,16 @@ public class JournalController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createArticle(@RequestBody Article newArticle) {
+    @Validated(OnCreate.class)
+    public ResponseEntity<?> createArticle(@RequestBody @Valid Article newArticle) {
         Article createdArticle = articleService.create(newArticle);
         EntityModel<Article> articleEntityModel = assembler.toModel(createdArticle);
         return new ResponseEntity<>(articleEntityModel, HttpStatus.CREATED);
     }
 
     @PatchMapping("/{articleId}/edit")
-    public ResponseEntity<?> updateJournal(@PathVariable("articleId") int articleId,
-                                    @RequestBody Article articleToUpdate) {
-        articleToUpdate.setId(articleId);
+    @Validated(OnUpdate.class)
+    public ResponseEntity<?> updateArticle(@RequestBody @Valid Article articleToUpdate) {
         Article updatedArticle = articleService.update(articleToUpdate);
         EntityModel<Article> articleEntityModel = assembler.toModel(updatedArticle);
         return ResponseEntity.ok(articleEntityModel);

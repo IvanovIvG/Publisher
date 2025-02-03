@@ -19,6 +19,9 @@ public class JournalModelAssembler implements RepresentationModelAssembler<Journ
         int journalId = journal.getId();
         return EntityModel.of(journal,
                 linkTo(methodOn(JournalController.class).showArticles(journalId)).withSelfRel(),
+                linkTo(methodOn(PublisherController.class).createJournal(null)).withRel("create"),
+                linkTo(methodOn(PublisherController.class).updateJournal(null)).withRel("update"),
+                linkTo(methodOn(PublisherController.class).deleteJournal(0)).withRel("delete"),
                 linkTo(methodOn(PublisherController.class).showAllJournals()).withRel("allJournals"));
     }
 }

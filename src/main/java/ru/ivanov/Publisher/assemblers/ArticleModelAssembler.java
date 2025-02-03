@@ -4,6 +4,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 import ru.ivanov.Publisher.controllers.JournalController;
+import ru.ivanov.Publisher.controllers.PublisherController;
 import ru.ivanov.Publisher.models.Article;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -18,6 +19,10 @@ public class ArticleModelAssembler implements RepresentationModelAssembler<Artic
     public EntityModel<Article> toModel(Article article) {
         int journalId = article.getJournal().getId();
         return EntityModel.of(article,
+                linkTo(methodOn(JournalController.class).createArticle(null)).withRel("create"),
+                linkTo(methodOn(JournalController.class).updateArticle(null)).withRel("update"),
+                linkTo(methodOn(JournalController.class).deleteArticle(0)).withRel("delete"),
                 linkTo(methodOn(JournalController.class).showArticles(journalId)).withRel("allJournalArticles"));
+
     }
 }
