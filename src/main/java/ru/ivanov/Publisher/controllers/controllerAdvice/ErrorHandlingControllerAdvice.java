@@ -1,5 +1,6 @@
 package ru.ivanov.Publisher.controllers.controllerAdvice;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.ConstraintViolation;
 
 import jakarta.validation.ConstraintViolationException;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import ru.ivanov.Publisher.dto.NotFoundError;
+import ru.ivanov.Publisher.dto.ValidationError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +20,7 @@ import java.util.List;
 /**
  * @author Ivan Ivanov
  **/
+@Hidden
 @ControllerAdvice
 public class ErrorHandlingControllerAdvice {
 
@@ -45,7 +49,7 @@ public class ErrorHandlingControllerAdvice {
     @ExceptionHandler(value = IllegalArgumentException.class, produces = "application/json")
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public String onMethodArgumentNotValidException(IllegalArgumentException e) {
-        return e.getMessage();
+    public NotFoundError onMethodArgumentNotValidException(IllegalArgumentException e) {
+        return new NotFoundError(e.getMessage());
     }
 }

@@ -2,14 +2,20 @@ package ru.ivanov.Publisher.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.ivanov.Publisher.dto.JournalDTO;
+import ru.ivanov.Publisher.dto.NotFoundError;
+import ru.ivanov.Publisher.dto.ValidationError;
 import ru.ivanov.Publisher.dto.validationGroups.OnCreate;
 import ru.ivanov.Publisher.dto.validationGroups.OnUpdate;
 import ru.ivanov.Publisher.services.JournalService;
@@ -32,14 +38,43 @@ public class PublisherController {
             summary = "Показать журналы",
             description = "Показывает все журналы издательства"
     )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = @Content(
+                                    array =
+                                    @ArraySchema(
+                                            schema = @Schema(implementation = JournalDTO.class))),
+                            description = "Найдены все журналы"
+                    )
+            }
+    )
     @GetMapping(produces = "application/json")
-    public List<JournalDTO> showAllJournals(){
+    public List<JournalDTO> showAllJournals() {
         return journalService.readAll();
     }
+
 
     @Operation(
             summary = "Создать журнал",
             description = "Создает новый журнал"
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            content = @Content(
+                                    schema = @Schema(implementation = JournalDTO.class)),
+                            description = "Журнал создан"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            content = @Content(
+                                    schema = @Schema(implementation = ValidationError.class)),
+                            description = "Ошибка валидации"
+                    )
+            }
     )
     @PostMapping(produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
@@ -49,25 +84,61 @@ public class PublisherController {
         return journalService.create(newJournal);
     }
 
+
     @Operation(
             summary = "Изменить журнал",
             description = "Изменяет существующий журнал"
     )
-    @PutMapping(path="/{journalId}/edit", produces = "application/json")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = @Content(
+                                    schema = @Schema(implementation = JournalDTO.class)),
+                            description = "Журнал обновлен"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            content = @Content(
+                                    schema = @Schema(implementation = ValidationError.class)),
+                            description = "Ошибка валидации"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            content = @Content(
+                                    schema = @Schema(
+                                            implementation = NotFoundError.class)),
+                            description = "Журнал не найден"
+                    )
+            }
+    )
+    @PutMapping(path = "/{journalId}/edit", produces = "application/json")
     @Validated(OnUpdate.class)
-    public JournalDTO updateJournal(@RequestBody @Valid JournalDTO journalToUpdate, @PathVariable int journalId) {
+    public JournalDTO updateJournal(@RequestBody @Valid JournalDTO journalToUpdate,
+                                    @Parameter(description = "id изменяемого журнала", example = "1")
+                                    @PathVariable int journalId) {
         journalToUpdate.setId(journalId);
         return journalService.update(journalToUpdate);
     }
+
 
     @Operation(
             summary = "Удалить журнал",
             description = "Удаляет существующий журнал"
     )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Журнал удален"
+                    )
+            }
+    )
     @DeleteMapping("/{journalId}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteJournal(@PathVariable("journalId") @Parameter(description = "Идентификатор удаляемого журнала", example = "1")
-                                               int journalId) {
+    public void deleteJournal(@PathVariable("journalId")
+                              @Parameter(description = "id удаляемого журнала", example = "1")
+                              int journalId) {
         journalService.delete(journalId);
     }
 }

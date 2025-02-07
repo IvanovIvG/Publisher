@@ -25,7 +25,6 @@ public class ArticleDTO {
     private int id;
 
     @Schema(description = "Сущность журнала которому принадлежит статья")
-    @NotNull(message = "Journal must not be empty")
     @Valid
     private JournalDTO journal;
 
