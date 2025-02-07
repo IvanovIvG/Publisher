@@ -1,67 +1,75 @@
 package ru.ivanov.Publisher.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.ivanov.Publisher.assemblers.ArticleModelAssembler;
-import ru.ivanov.Publisher.models.Article;
-import ru.ivanov.Publisher.models.validationGroups.OnCreate;
-import ru.ivanov.Publisher.models.validationGroups.OnUpdate;
+import ru.ivanov.Publisher.dto.ArticleDTO;
+import ru.ivanov.Publisher.dto.validationGroups.OnCreate;
+import ru.ivanov.Publisher.dto.validationGroups.OnUpdate;
 import ru.ivanov.Publisher.services.ArticleService;
 
 import java.util.List;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author Ivan Ivanov
  **/
-@Controller
+@RestController
+@Tag(name = "Контролер статей журнала", description = "Контроллер для работы со статьями журнала")
 @RequiredArgsConstructor
 @RequestMapping("/publisher/{journalId}")
 @Validated
 public class JournalController {
     private final ArticleService articleService;
-    private final ArticleModelAssembler assembler;
 
-    @GetMapping()
-    public ResponseEntity<?> showArticles(@PathVariable int journalId){
-        List<EntityModel<Article>> articles = articleService.readAllByJournal(journalId).stream()
-                .map(assembler::toModel)
-                .toList();
-
-        CollectionModel<EntityModel<Article>> articleCollectionModel = CollectionModel.of(articles,
-                linkTo(methodOn(JournalController.class).showArticles(journalId)).withSelfRel());
-
-        return ResponseEntity.ok(articleCollectionModel);
+    @Operation(
+            summary = "Показать статьи",
+            description = "Показывает статьи журнала"
+    )
+    @GetMapping(produces = "application/json")
+    public List<ArticleDTO> showArticles(@PathVariable int journalId) {
+        return articleService.readAllByJournal(journalId);
     }
 
-    @PostMapping()
+    @Operation(
+            summary = "Создать статью",
+            description = "Создает новую статью в журнале"
+    )
+    @PostMapping(produces = "application/json")
+    @ResponseStatus(HttpStatus.CREATED)
     @Validated(OnCreate.class)
-    public ResponseEntity<?> createArticle(@RequestBody @Valid Article newArticle) {
-        Article createdArticle = articleService.create(newArticle);
-        EntityModel<Article> articleEntityModel = assembler.toModel(createdArticle);
-        return new ResponseEntity<>(articleEntityModel, HttpStatus.CREATED);
+    public ArticleDTO createArticle(@RequestBody @Valid ArticleDTO newArticle,
+                                    @PathVariable int journalId) {
+        newArticle.setId(journalId);
+        return articleService.create(newArticle);
     }
 
-    @PatchMapping("/{articleId}/edit")
+    @Operation(
+            summary = "Изменить статью",
+            description = "Изменяет существующую статьи журнала"
+    )
+    @PutMapping(path = "/{articleId}/edit", produces = "application/json")
     @Validated(OnUpdate.class)
-    public ResponseEntity<?> updateArticle(@RequestBody @Valid Article articleToUpdate) {
-        Article updatedArticle = articleService.update(articleToUpdate);
-        EntityModel<Article> articleEntityModel = assembler.toModel(updatedArticle);
-        return ResponseEntity.ok(articleEntityModel);
+    public ArticleDTO updateArticle(@RequestBody @Valid ArticleDTO articleToUpdate,
+                                           @PathVariable int journalId) {
+        articleToUpdate.setId(journalId);
+        return articleService.update(articleToUpdate);
     }
 
+    @Operation(
+            summary = "Удалить статьи",
+            description = "Удаляет статью журнала"
+    )
     @DeleteMapping("/{articleId}")
-    public ResponseEntity<?> deleteArticle(@PathVariable("articleId") int articleId) {
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteArticle(@PathVariable("articleId") @Parameter(description = "Идентификатор удаляемой статьи", example = "1")
+                                           int articleId) {
         articleService.delete(articleId);
-        return ResponseEntity.ok().build();
     }
 }

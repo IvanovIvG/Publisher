@@ -1,8 +1,10 @@
 package ru.ivanov.Publisher.services;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.ivanov.Publisher.dto.JournalDTO;
 import ru.ivanov.Publisher.models.Journal;
 import ru.ivanov.Publisher.repositories.JournalRepository;
 
@@ -17,47 +19,61 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class JournalService {
     private final JournalRepository journalRepository;
+    private final ModelMapper modelMapper;
+
 
     @Transactional
-    public Journal create(Journal journal) {
-        if(thereIsNoJournalWithSameId(journal)){
-            return journalRepository.save(journal);
-        }
-        else{
+    public JournalDTO create(JournalDTO journalDTO) {
+        Journal journal = convertToEntity(journalDTO);
+        if (thereIsNoJournalWithSameId(journal)) {
+            return convertToDTO(journalRepository.save(journal));
+        } else {
             throw new IllegalArgumentException("There is already journal with such id");
         }
     }
 
-    public Journal readById(int id) {
-        Optional<Journal> foundJournal = journalRepository.findById(id);
-        return foundJournal.orElseThrow(() -> new IllegalArgumentException("There is no journal with such id"));
+    public JournalDTO readById(int id){
+        return convertToDTO(getJournalById(id));
     }
 
-    public List<Journal> readAll() {
-        return journalRepository.findAll();
+    public Journal getJournalById(int id) {
+        return journalRepository.findById(id).
+                orElseThrow(() -> new IllegalArgumentException("There is no journal with such id"));
+    }
+
+    public List<JournalDTO> readAll() {
+        return journalRepository.findAll().stream().map(this::convertToDTO).toList();
     }
 
     @Transactional
-    public Journal update(Journal journal) {
+    public JournalDTO update(JournalDTO journalDTO) {
+        Journal journal = convertToEntity(journalDTO);
         if (thereIsJournalWithSameId(journal)) {
-            return journalRepository.save(journal);
-        }
-        else{
+            return convertToDTO(journalRepository.save(journal));
+        } else {
             throw new IllegalArgumentException("There is no journal with such id");
         }
     }
 
     @Transactional
-    public void delete(int id){
+    public void delete(int id) {
         journalRepository.deleteById(id);
     }
 
-    private boolean thereIsNoJournalWithSameId(Journal journal){
+    private boolean thereIsNoJournalWithSameId(Journal journal) {
         return !thereIsJournalWithSameId(journal);
     }
 
-    private boolean thereIsJournalWithSameId(Journal journal){
+    private boolean thereIsJournalWithSameId(Journal journal) {
         int journalId = journal.getId();
         return journalRepository.findById(journalId).isPresent();
+    }
+
+    private Journal convertToEntity(JournalDTO journalDTO) {
+        return modelMapper.map(journalDTO, Journal.class);
+    }
+
+    private JournalDTO convertToDTO(Journal journal) {
+        return modelMapper.map(journal, JournalDTO.class);
     }
 }

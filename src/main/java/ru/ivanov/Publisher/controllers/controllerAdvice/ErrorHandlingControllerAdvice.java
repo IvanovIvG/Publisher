@@ -11,40 +11,41 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Ivan Ivanov
  **/
 @ControllerAdvice
 public class ErrorHandlingControllerAdvice {
 
-    @ExceptionHandler(ConstraintViolationException.class)
+    @ExceptionHandler(value = ConstraintViolationException.class, produces = "application/json")
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    ValidationErrorResponse onConstraintValidationException(ConstraintViolationException e) {
-        ValidationErrorResponse error = new ValidationErrorResponse();
+    public List<ValidationError> onConstraintValidationException(ConstraintViolationException e) {
+        List<ValidationError> errors = new ArrayList<>();
         for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
-            error.getViolations().add(new Violation(violation.getPropertyPath().toString(), violation.getMessage()));
+            errors.add(new ValidationError(violation.getPropertyPath().toString(), violation.getMessage()));
         }
-        return error;
+        return errors;
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler(value = MethodArgumentNotValidException.class, produces = "application/json")
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    ValidationErrorResponse onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        ValidationErrorResponse error = new ValidationErrorResponse();
+    public List<ValidationError> onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        List<ValidationError> errors = new ArrayList<>();
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
-            error.getViolations().add(new Violation(fieldError.getField(), fieldError.getDefaultMessage()));
+            errors.add(new ValidationError(fieldError.getField(), fieldError.getDefaultMessage()));
         }
-        return error;
+        return errors;
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(value = IllegalArgumentException.class, produces = "application/json")
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    ValidationErrorResponse onMethodArgumentNotValidException(IllegalArgumentException e) {
-        ValidationErrorResponse error = new ValidationErrorResponse();
-        error.getViolations().add(new Violation("id", e.getMessage()));
-        return error;
+    public String onMethodArgumentNotValidException(IllegalArgumentException e) {
+        return e.getMessage();
     }
 }
