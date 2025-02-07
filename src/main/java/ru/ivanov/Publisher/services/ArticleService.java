@@ -5,7 +5,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ivanov.Publisher.dto.ArticleDTO;
-import ru.ivanov.Publisher.dto.JournalDTO;
 import ru.ivanov.Publisher.models.Article;
 import ru.ivanov.Publisher.models.Journal;
 import ru.ivanov.Publisher.repositories.ArticleRepository;

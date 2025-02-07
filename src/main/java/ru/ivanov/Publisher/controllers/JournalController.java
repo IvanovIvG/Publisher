@@ -10,11 +10,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.ivanov.Publisher.dto.ArticleDTO;
-import ru.ivanov.Publisher.dto.JournalDTO;
 import ru.ivanov.Publisher.dto.NotFoundError;
 import ru.ivanov.Publisher.dto.ValidationError;
 import ru.ivanov.Publisher.dto.validationGroups.OnCreate;
@@ -153,16 +151,8 @@ public class JournalController {
     @ApiResponses(
             value = {
                     @ApiResponse(
-                            responseCode = "201",
-                            content = @Content(
-                                    schema = @Schema(implementation = ArticleDTO.class)),
+                            responseCode = "200",
                             description = "Статья удалена"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            content = @Content(
-                                    schema = @Schema(implementation = NotFoundError.class)),
-                            description = "Не найдена статья"
                     )
             }
     )

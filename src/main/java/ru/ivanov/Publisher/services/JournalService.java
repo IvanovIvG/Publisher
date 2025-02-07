@@ -9,7 +9,6 @@ import ru.ivanov.Publisher.models.Journal;
 import ru.ivanov.Publisher.repositories.JournalRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivan Ivanov

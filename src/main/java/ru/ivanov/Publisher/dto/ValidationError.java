@@ -16,5 +16,4 @@ public class ValidationError {
 
     @Schema(description = "Сообщение об ошибке", example = "Name must not be empty")
     private final String message;
-
 }
