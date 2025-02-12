@@ -1,6 +1,7 @@
 package ru.ivanov.Publisher.configs;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
@@ -13,6 +14,7 @@ import java.util.List;
 /**
  * @author Ivan Ivanov
  **/
+@Configuration
 public class SecurityConfig {
 
     @Bean
@@ -29,9 +31,11 @@ public class SecurityConfig {
             };
             c.configurationSource(source);
         });
+
         http.csrf(
                 AbstractHttpConfigurer::disable
         );
+
         http
                 .authorizeHttpRequests(c -> c.anyRequest().permitAll());
         return http.build();
