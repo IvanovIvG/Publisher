@@ -31,13 +31,10 @@ public class SecurityConfig {
             };
             c.configurationSource(source);
         });
-
         http.csrf(
                 AbstractHttpConfigurer::disable
         );
-
-        http
-                .authorizeHttpRequests(c -> c.anyRequest().permitAll());
+        http.authorizeHttpRequests(c -> c.anyRequest().permitAll());
         return http.build();
     }
 }

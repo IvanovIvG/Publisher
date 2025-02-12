@@ -112,7 +112,7 @@ public class PublisherController {
                     )
             }
     )
-    @PutMapping(path = "/{journalId}/edit", produces = "application/json")
+    @PutMapping(path = "/{journalId}", produces = "application/json")
     @Validated(OnUpdate.class)
     public JournalDTO updateJournal(@RequestBody @Valid JournalDTO journalToUpdate,
                                     @Parameter(description = "id изменяемого журнала", example = "1")

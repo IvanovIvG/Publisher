@@ -129,7 +129,7 @@ public class JournalController {
                     )
             }
     )
-    @PutMapping(path = "/{articleId}/edit", produces = "application/json")
+    @PutMapping(path = "/{articleId}", produces = "application/json")
     @Validated(OnUpdate.class)
     public ArticleDTO updateArticle(@RequestBody @Valid ArticleDTO articleToUpdate,
                                     @PathVariable
