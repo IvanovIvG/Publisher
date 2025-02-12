@@ -22,14 +22,13 @@ services:
   service-db:
     image: postgres:14.7-alpine
     environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     ports:
-      - "15432:5432"
+      - "5432:5432"
     volumes:
       - ./infrastructure/db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
-      - ./db:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     restart: unless-stopped
 volumes:
   db-data:
-  pgadmin-data:
