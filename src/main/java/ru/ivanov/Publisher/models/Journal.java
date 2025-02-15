@@ -19,4 +19,7 @@ public class Journal {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "number")
+    private String number;
 }
