@@ -8,6 +8,8 @@ import ru.ivanov.Publisher.stagesEnums.FourStateStage;
 import ru.ivanov.Publisher.stagesEnums.ThreeStateStage;
 import ru.ivanov.Publisher.stagesEnums.TwoStateStage;
 
+import java.util.UUID;
+
 /**
  * @author Ivan Ivanov
  **/
@@ -18,8 +20,7 @@ import ru.ivanov.Publisher.stagesEnums.TwoStateStage;
 public class Article {
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name="journal", referencedColumnName = "id")

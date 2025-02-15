@@ -1,5 +1,6 @@
 package ru.ivanov.Publisher.services;
 
+import com.fasterxml.uuid.Generators;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import ru.ivanov.Publisher.models.Journal;
 import ru.ivanov.Publisher.repositories.JournalRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Ivan Ivanov
@@ -24,6 +26,7 @@ public class JournalService {
     @Transactional
     public JournalDTO create(JournalDTO journalDTO) {
         Journal journal = convertToEntity(journalDTO);
+        journal.setId(Generators.timeBasedEpochGenerator().generate());
         if (thereIsNoJournalWithSameId(journal)) {
             return convertToDTO(journalRepository.save(journal));
         } else {
@@ -31,11 +34,11 @@ public class JournalService {
         }
     }
 
-    public JournalDTO readById(int id){
+    public JournalDTO readById(UUID id){
         return convertToDTO(getJournalById(id));
     }
 
-    public Journal getJournalById(int id) {
+    public Journal getJournalById(UUID id) {
         return journalRepository.findById(id).
                 orElseThrow(() -> new IllegalArgumentException("There is no journal with such id"));
     }
@@ -55,7 +58,7 @@ public class JournalService {
     }
 
     @Transactional
-    public void delete(int id) {
+    public void delete(UUID id) {
         journalRepository.deleteById(id);
     }
 
@@ -64,7 +67,7 @@ public class JournalService {
     }
 
     private boolean thereIsJournalWithSameId(Journal journal) {
-        int journalId = journal.getId();
+        UUID journalId = journal.getId();
         return journalRepository.findById(journalId).isPresent();
     }
 

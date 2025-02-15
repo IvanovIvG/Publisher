@@ -12,6 +12,8 @@ import ru.ivanov.Publisher.stagesEnums.ThreeStateStage;
 import ru.ivanov.Publisher.stagesEnums.TwoStateStage;
 import ru.ivanov.Publisher.dto.validationGroups.OnCreate;
 
+import java.util.UUID;
+
 /**
  * @author Ivan Ivanov
  **/
@@ -19,9 +21,8 @@ import ru.ivanov.Publisher.dto.validationGroups.OnCreate;
 @Data
 @NoArgsConstructor
 public class ArticleDTO {
-    @Schema(description = "Уникальный идентификатор статьи", example = "1")
-    @Min(value = 0, message = "Id must be positive")
-    private int id;
+    @Schema(description = "Уникальный идентификатор статьи", example = "01950a12-e683-7d10-9c45-ee66c4b4aaad")
+    private UUID id;
 
     @Schema(description = "Название статьи", example = "article1")
     @JsonProperty("название")

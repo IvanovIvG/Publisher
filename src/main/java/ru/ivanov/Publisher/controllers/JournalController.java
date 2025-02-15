@@ -20,6 +20,7 @@ import ru.ivanov.Publisher.dto.validationGroups.OnUpdate;
 import ru.ivanov.Publisher.services.ArticleService;
 
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -56,8 +57,9 @@ public class JournalController {
     )
     @GetMapping(produces = "application/json")
     public List<ArticleDTO> showArticles(@PathVariable
-                                         @Parameter(description = "id журнала статей", example = "1")
-                                         int journalId) {
+                                         @Parameter(description = "id журнала статей",
+                                                 example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
+                                         UUID journalId) {
         return articleService.readAllByJournal(journalId);
     }
 
@@ -93,9 +95,10 @@ public class JournalController {
     @Validated(OnCreate.class)
     public ArticleDTO createArticle(@RequestBody @Valid ArticleDTO newArticle,
                                     @PathVariable
-                                    @Parameter(description = "id журнала создаваемой статьи", example = "1")
-                                    int journalId) {
-        newArticle.setId(0);
+                                    @Parameter(description = "id журнала создаваемой статьи",
+                                            example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
+                                    UUID journalId) {
+        newArticle.setId(null);
         return articleService.create(newArticle, journalId);
     }
 
@@ -130,11 +133,13 @@ public class JournalController {
     @Validated(OnUpdate.class)
     public ArticleDTO updateArticle(@RequestBody @Valid ArticleDTO articleToUpdate,
                                     @PathVariable
-                                    @Parameter(description = "id журнала изменяемой статьи", example = "1")
-                                    int journalId,
+                                    @Parameter(description = "id журнала изменяемой статьи",
+                                            example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
+                                    UUID journalId,
                                     @PathVariable
-                                    @Parameter(description = "id создаваемой статьи", example = "1")
-                                    int articleId) {
+                                    @Parameter(description = "id создаваемой статьи",
+                                            example = "01950a12-e683-7d10-9c45-ee66c4b4aaad")
+                                    UUID articleId) {
         articleToUpdate.setId(articleId);
         return articleService.update(articleToUpdate, journalId);
     }
@@ -155,11 +160,13 @@ public class JournalController {
     @DeleteMapping("/{articleId}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteArticle(@PathVariable
-                              @Parameter(description = "id журнала удаляемой статьи", example = "1")
-                              int journalId,
+                              @Parameter(description = "id журнала удаляемой статьи",
+                                      example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
+                              UUID journalId,
                               @PathVariable("articleId")
-                              @Parameter(description = "id удаляемой статьи", example = "1")
-                              int articleId) {
+                              @Parameter(description = "id удаляемой статьи",
+                                      example = "01950a12-e683-7d10-9c45-ee66c4b4aaad")
+                              UUID articleId) {
         articleService.delete(articleId);
     }
 }

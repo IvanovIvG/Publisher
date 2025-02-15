@@ -2,12 +2,13 @@ package ru.ivanov.Publisher.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.ivanov.Publisher.dto.validationGroups.OnCreate;
+
+import java.util.UUID;
 
 /**
  * @author Ivan Ivanov
@@ -16,9 +17,8 @@ import ru.ivanov.Publisher.dto.validationGroups.OnCreate;
 @Data
 @NoArgsConstructor
 public class JournalDTO {
-    @Schema(description = "Уникальный идентификатор журнала", example = "1")
-    @Min(value = 0, message = "Id must be positive")
-    private int id;
+    @Schema(description = "Уникальный идентификатор журнала", example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
+    private UUID id;
 
     @Schema(description = "Название журнала", example = "journal1")
     @JsonProperty("название")

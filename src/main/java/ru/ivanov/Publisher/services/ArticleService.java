@@ -1,5 +1,6 @@
 package ru.ivanov.Publisher.services;
 
+import com.fasterxml.uuid.Generators;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import ru.ivanov.Publisher.models.Journal;
 import ru.ivanov.Publisher.repositories.ArticleRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Ivan Ivanov
@@ -23,8 +25,9 @@ public class ArticleService {
     private final ModelMapper modelMapper;
 
     @Transactional
-    public ArticleDTO create(ArticleDTO articleDTO, int journalId) {
+    public ArticleDTO create(ArticleDTO articleDTO, UUID journalId) {
         Article article = convertToEntity(articleDTO, journalId);
+        article.setId(Generators.timeBasedEpochGenerator().generate());
         if (thereIsNoArticleWithSameId(article)) {
             return convertToDTO(articleRepository.save(article));
         } else {
@@ -32,7 +35,7 @@ public class ArticleService {
         }
     }
 
-    public ArticleDTO readById(int id) {
+    public ArticleDTO readById(UUID id) {
         Article foundArticle = articleRepository.findById(id).
                 orElseThrow(() ->
                         new IllegalArgumentException("There is no article with such id"));
@@ -43,13 +46,13 @@ public class ArticleService {
         return articleRepository.findAll().stream().map(this::convertToDTO).toList();
     }
 
-    public List<ArticleDTO> readAllByJournal(int journalId) {
+    public List<ArticleDTO> readAllByJournal(UUID journalId) {
         Journal journal = journalService.getJournalById(journalId);
         return articleRepository.findByJournal(journal).stream().map(this::convertToDTO).toList();
     }
 
     @Transactional
-    public ArticleDTO update(ArticleDTO articleDTO, int journalId) {
+    public ArticleDTO update(ArticleDTO articleDTO, UUID journalId) {
         Article article = convertToEntity(articleDTO, journalId);
         if (thereIsArticleWithSameId(article)) {
             return convertToDTO(articleRepository.save(article));
@@ -59,7 +62,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public void delete(int id) {
+    public void delete(UUID id) {
         articleRepository.deleteById(id);
     }
 
@@ -68,11 +71,11 @@ public class ArticleService {
     }
 
     private boolean thereIsArticleWithSameId(Article article) {
-        int articleId = article.getId();
+        UUID articleId = article.getId();
         return articleRepository.findById(articleId).isPresent();
     }
 
-    private Article convertToEntity(ArticleDTO articleDTO, int journalId) {
+    private Article convertToEntity(ArticleDTO articleDTO, UUID journalId) {
         Article article = modelMapper.map(articleDTO, Article.class);
         article.setJournal(journalService.getJournalById(journalId));
         return article;

@@ -6,11 +6,12 @@ import ru.ivanov.Publisher.models.Article;
 import ru.ivanov.Publisher.models.Journal;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Ivan Ivanov
  **/
 @Repository
-public interface ArticleRepository extends JpaRepository<Article, Integer> {
+public interface ArticleRepository extends JpaRepository<Article, UUID> {
     List<Article> findByJournal(Journal journal);
 }

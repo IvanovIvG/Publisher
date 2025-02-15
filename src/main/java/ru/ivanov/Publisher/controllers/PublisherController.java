@@ -21,6 +21,7 @@ import ru.ivanov.Publisher.dto.validationGroups.OnUpdate;
 import ru.ivanov.Publisher.services.JournalService;
 
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -80,7 +81,7 @@ public class PublisherController {
     @ResponseStatus(HttpStatus.CREATED)
     @Validated(OnCreate.class)
     public JournalDTO createJournal(@RequestBody @Valid JournalDTO newJournal) {
-        newJournal.setId(0);
+        newJournal.setId(null);
         return journalService.create(newJournal);
     }
 
@@ -115,8 +116,9 @@ public class PublisherController {
     @PutMapping(path = "/{journalId}", produces = "application/json")
     @Validated(OnUpdate.class)
     public JournalDTO updateJournal(@RequestBody @Valid JournalDTO journalToUpdate,
-                                    @Parameter(description = "id изменяемого журнала", example = "1")
-                                    @PathVariable int journalId) {
+                                    @Parameter(description = "id изменяемого журнала",
+                                            example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
+                                    @PathVariable UUID journalId) {
         journalToUpdate.setId(journalId);
         return journalService.update(journalToUpdate);
     }
@@ -137,8 +139,9 @@ public class PublisherController {
     @DeleteMapping("/{journalId}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteJournal(@PathVariable("journalId")
-                              @Parameter(description = "id удаляемого журнала", example = "1")
-                              int journalId) {
+                              @Parameter(description = "id удаляемого журнала",
+                                      example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
+                              UUID journalId) {
         journalService.delete(journalId);
     }
 }
