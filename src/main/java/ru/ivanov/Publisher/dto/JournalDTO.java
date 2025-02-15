@@ -1,5 +1,6 @@
 package ru.ivanov.Publisher.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ public class JournalDTO {
     private int id;
 
     @Schema(description = "Название журнала", example = "journal1")
+    @JsonProperty("название")
     @Size(min = 1, max = 100, message = "Name must be from 1 to 100 length")
     @NotBlank(message = "Name must not be empty", groups = OnCreate.class)
     private String name;

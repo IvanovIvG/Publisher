@@ -18,7 +18,6 @@ import ru.ivanov.Publisher.dto.ValidationError;
 import ru.ivanov.Publisher.dto.validationGroups.OnCreate;
 import ru.ivanov.Publisher.dto.validationGroups.OnUpdate;
 import ru.ivanov.Publisher.services.ArticleService;
-import ru.ivanov.Publisher.services.JournalService;
 
 import java.util.List;
 
@@ -33,7 +32,6 @@ import java.util.List;
 @Validated
 public class JournalController {
     private final ArticleService articleService;
-    private final JournalService journalService;
 
     @Operation(
             summary = "Показать статьи",
