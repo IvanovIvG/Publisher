@@ -23,8 +23,8 @@ public class ArticleService {
     private final ModelMapper modelMapper;
 
     @Transactional
-    public ArticleDTO create(ArticleDTO articleDTO) {
-        Article article = convertToEntity(articleDTO);
+    public ArticleDTO create(ArticleDTO articleDTO, int journalId) {
+        Article article = convertToEntity(articleDTO, journalId);
         if (thereIsNoArticleWithSameId(article)) {
             return convertToDTO(articleRepository.save(article));
         } else {
@@ -49,8 +49,8 @@ public class ArticleService {
     }
 
     @Transactional
-    public ArticleDTO update(ArticleDTO articleDTO) {
-        Article article = convertToEntity(articleDTO);
+    public ArticleDTO update(ArticleDTO articleDTO, int journalId) {
+        Article article = convertToEntity(articleDTO, journalId);
         if (thereIsArticleWithSameId(article)) {
             return convertToDTO(articleRepository.save(article));
         } else {
@@ -72,8 +72,10 @@ public class ArticleService {
         return articleRepository.findById(articleId).isPresent();
     }
 
-    private Article convertToEntity(ArticleDTO articleDTO) {
-        return modelMapper.map(articleDTO, Article.class);
+    private Article convertToEntity(ArticleDTO articleDTO, int journalId) {
+        Article article = modelMapper.map(articleDTO, Article.class);
+        article.setJournal(journalService.getJournalById(journalId));
+        return article;
     }
 
     private ArticleDTO convertToDTO(Article article) {

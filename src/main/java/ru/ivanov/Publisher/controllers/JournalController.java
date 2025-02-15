@@ -98,8 +98,7 @@ public class JournalController {
                                     @Parameter(description = "id журнала создаваемой статьи", example = "1")
                                     int journalId) {
         newArticle.setId(0);
-        newArticle.setJournal(journalService.readById(journalId));
-        return articleService.create(newArticle);
+        return articleService.create(newArticle, journalId);
     }
 
 
@@ -139,8 +138,7 @@ public class JournalController {
                                     @Parameter(description = "id создаваемой статьи", example = "1")
                                     int articleId) {
         articleToUpdate.setId(articleId);
-        articleToUpdate.setJournal(journalService.readById(journalId));
-        return articleService.update(articleToUpdate);
+        return articleService.update(articleToUpdate, journalId);
     }
 
 

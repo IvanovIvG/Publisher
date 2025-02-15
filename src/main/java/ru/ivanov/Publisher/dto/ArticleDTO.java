@@ -23,10 +23,6 @@ public class ArticleDTO {
     @Min(value = 0, message = "Id must be positive")
     private int id;
 
-    @Schema(description = "Сущность журнала которому принадлежит статья")
-    @Valid
-    private JournalDTO journal;
-
     @Schema(description = "Название статьи", example = "article1")
     @Size(min = 1, max = 100, message = "Name must be from 1 to 100 length")
     @NotBlank(message = "Name must not be empty", groups = OnCreate.class)
