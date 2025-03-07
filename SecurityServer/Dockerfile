@@ -7,5 +7,5 @@ RUN ./mvnw clean install -DskipTests
 
 FROM openjdk:23-jdk
 COPY --from=builder target/*.jar *.jar
-EXPOSE 8080
+EXPOSE 9090
 ENTRYPOINT ["java", "-jar", "*.jar"]
