@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   backend:
-    image: backend:0.0.1
+    image: backend:0.1.0
     container_name: backend
     build:
       context: ./BackEnd
@@ -13,7 +13,7 @@ services:
       - SERVER_PORT= 8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://database/publisher
   security:
-    image: security:0.0.1
+    image: security:0.1.0
     container_name: security
     build:
       context: ./SecurityServer
