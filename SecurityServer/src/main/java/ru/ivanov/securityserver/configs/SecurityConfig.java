@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +23,7 @@ import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -29,6 +32,8 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
@@ -39,7 +44,10 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Collections;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivan Ivanov
@@ -68,20 +76,25 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests((authorize) ->
-                        authorize
+                .authorizeHttpRequests((authorize) -> authorize
                                 .anyRequest().authenticated()
                 )
-                // ADD THIS LINE HERE
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
-                // Form login handles the redirect to the login page from the
-                // authorization server filter chain
+                .oauth2ResourceServer((oauth2) ->
+                        oauth2.jwt(jwt -> jwt
+                                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
+                )
                 .formLogin(Customizer.withDefaults());
         return http.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService(DataSource dataSource) {
+        return jdbcUserDetailsManager(dataSource);
+    }
+
+    @Bean
+    public JdbcUserDetailsManager jdbcUserDetailsManager(DataSource dataSource){
         String usersByUsernameQuery = "select username, password, enabled from users where username = ?";
         String authsByUserQuery = "select username, authority from authorities where username = ?";
         var userDetailsManager = new JdbcUserDetailsManager(dataSource);
@@ -136,10 +149,28 @@ public class SecurityConfig {
     }
 
     @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
+    }
+
+    @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer() {
-        return context -> {
-            JwtClaimsSet.Builder claims = context.getClaims();
-            claims.claim("priority", "HIGH");
+        return (context) -> {
+            if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
+                context.getClaims().claims((claims) -> {
+                    Set<String> roles = AuthorityUtils.authorityListToSet(context.getPrincipal().getAuthorities())
+                            .stream()
+                            .map(c -> c.replaceFirst("^ROLE_", ""))
+                            .collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
+                    claims.put("roles", roles);
+                });
+            }
         };
     }
 }

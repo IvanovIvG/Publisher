@@ -1,15 +1,11 @@
 package ru.ivanov.securityserver.controllers;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * @author Ivan Ivanov
@@ -20,7 +16,9 @@ public class Controller {
 
     @GetMapping()
     public Boolean showUserExist () {
-        System.out.println("in controller");
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication authentication = context.getAuthentication();
+
         return true;
     }
 }
