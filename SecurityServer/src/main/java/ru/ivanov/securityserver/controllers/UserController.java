@@ -11,8 +11,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.ivanov.securityserver.dto.Role;
 import ru.ivanov.securityserver.dto.UserInfo;
 import ru.ivanov.securityserver.dto.UserDTO;
+import ru.ivanov.securityserver.services.UserService;
+import ru.ivanov.securityserver.valiodators.PasswordValidator;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +28,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
+    private final UserService userService;
+    private final PasswordValidator passwordValidator;
 
 
     @Operation(
@@ -43,7 +48,7 @@ public class UserController {
     )
     @GetMapping(produces = "application/json")
     public List<UserDTO> showAllUsers() {
-        return null;
+        return userService.readAll();
     }
 
 
@@ -66,7 +71,7 @@ public class UserController {
                             @Parameter(description = "id пользователя",
                                     example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
                             UUID userId) {
-        return null;
+        return userService.readById(userId);
     }
 
 
@@ -85,8 +90,10 @@ public class UserController {
             }
     )
     @PostMapping(produces = "application/json")
+    @ResponseStatus(HttpStatus.CREATED)
     public UserDTO createUser(@RequestBody @Valid UserInfo newUser) {
-        return null;
+        newUser.setId(null);
+        return userService.create(newUser);
     }
 
 
@@ -110,7 +117,8 @@ public class UserController {
                                       example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
                               UUID userId,
                               @RequestBody @Valid UserInfo updatedUser) {
-        return null;
+        updatedUser.setId(userId);
+        return userService.update(updatedUser);
     }
 
 
@@ -137,9 +145,8 @@ public class UserController {
                               @Schema(description = "Новое право доступа пользователя",
                                       example = "ROLE_READ"
                               )
-
-                              String newRole) {
-        return null;
+                              Role newRole) {
+        return userService.changeRole(userId, newRole);
     }
 
 
@@ -165,7 +172,8 @@ public class UserController {
                                @Schema(description = "новый пароль",
                                        example = "newSuperSecretPassword")
                                String newPassword) {
-
+        passwordValidator.validate(newPassword);
+        userService.changePassword(userId, newPassword);
     }
 
 
@@ -187,6 +195,6 @@ public class UserController {
                            @Parameter(description = "id пользователя",
                                    example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
                            UUID userId) {
-
+        userService.deleteUser(userId);
     }
 }
