@@ -34,6 +34,7 @@ import java.util.UUID;
 public class JournalController {
     private final ArticleService articleService;
 
+
     @Operation(
             summary = "Показать статьи",
             description = "Показывает статьи журнала"

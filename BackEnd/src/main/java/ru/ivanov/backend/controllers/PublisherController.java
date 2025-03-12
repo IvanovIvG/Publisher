@@ -35,6 +35,7 @@ import java.util.UUID;
 public class PublisherController {
     private final JournalService journalService;
 
+
     @Operation(
             summary = "Показать журналы",
             description = "Показывает все журналы издательства"
