@@ -12,7 +12,7 @@ import lombok.Data;
 public class UserDTO {
     @Schema(description = "Уникальный идентификатор пользователя")
     @Valid
-    private UserInfo userInfo;
+    private UserInfoDTO userInfoDTO;
 
     @Schema(description = "Права пользователя", example = "ROLE_ADMIN")
     private Role role;

@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.ivanov.securityserver.dto.Role;
-import ru.ivanov.securityserver.dto.UserInfo;
+import ru.ivanov.securityserver.dto.UserInfoDTO;
 import ru.ivanov.securityserver.dto.UserDTO;
 import ru.ivanov.securityserver.services.UserService;
 import ru.ivanov.securityserver.valiodators.PasswordValidator;
@@ -91,9 +91,10 @@ public class UserController {
     )
     @PostMapping(produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDTO createUser(@RequestBody @Valid UserInfo newUser) {
+    public UserDTO createUser(@RequestBody @Valid UserInfoDTO newUser) {
         newUser.setId(null);
-        return userService.create(newUser);
+        String password = "password";
+        return userService.create(newUser, password);
     }
 
 
@@ -116,7 +117,7 @@ public class UserController {
                               @Parameter(description = "id пользователя",
                                       example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
                               UUID userId,
-                              @RequestBody @Valid UserInfo updatedUser) {
+                              @RequestBody @Valid UserInfoDTO updatedUser) {
         updatedUser.setId(userId);
         return userService.update(updatedUser);
     }

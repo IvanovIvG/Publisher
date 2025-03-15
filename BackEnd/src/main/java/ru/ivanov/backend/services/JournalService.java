@@ -22,20 +22,9 @@ public class JournalService {
     private final JournalRepository journalRepository;
     private final ModelMapper modelMapper;
 
-
-    @Transactional
-    public JournalDTO create(JournalDTO journalDTO) {
-        Journal journal = convertToEntity(journalDTO);
-        journal.setId(Generators.timeBasedEpochGenerator().generate());
-        if (thereIsNoJournalWithSameId(journal)) {
-            return convertToDTO(journalRepository.save(journal));
-        } else {
-            throw new IllegalArgumentException("There is already journal with such id");
-        }
-    }
-
-    public JournalDTO readById(UUID id){
-        return convertToDTO(getJournalById(id));
+    public JournalDTO readById(UUID id) {
+        Journal journal = getJournalById(id);
+        return convertToDTO(journal);
     }
 
     public Journal getJournalById(UUID id) {
@@ -48,13 +37,22 @@ public class JournalService {
     }
 
     @Transactional
+    public JournalDTO create(JournalDTO journalDTO) {
+        Journal journal = convertToEntity(journalDTO);
+        journal.setId(generateJournalUniqueID());
+        return convertToDTO(journalRepository.save(journal));
+
+    }
+
+    @Transactional
     public JournalDTO update(JournalDTO journalDTO) {
         Journal journal = convertToEntity(journalDTO);
-        if (thereIsJournalWithSameId(journal)) {
-            return convertToDTO(journalRepository.save(journal));
+        if (journalExists(journal)) {
+            journal = journalRepository.save(journal);
         } else {
             throw new IllegalArgumentException("There is no journal with such id");
         }
+        return convertToDTO(journal);
     }
 
     @Transactional
@@ -62,13 +60,20 @@ public class JournalService {
         journalRepository.deleteById(id);
     }
 
-    private boolean thereIsNoJournalWithSameId(Journal journal) {
-        return !thereIsJournalWithSameId(journal);
+    private UUID generateJournalUniqueID() {
+        UUID id = Generators.timeBasedEpochGenerator().generate();
+        while (suchJournalIDIsNotUnique(id)) {
+            id = Generators.timeBasedEpochGenerator().generate();
+        }
+        return id;
     }
 
-    private boolean thereIsJournalWithSameId(Journal journal) {
-        UUID journalId = journal.getId();
-        return journalRepository.findById(journalId).isPresent();
+    private boolean suchJournalIDIsNotUnique(UUID id) {
+        return journalRepository.existsById(id);
+    }
+
+    private boolean journalExists(Journal journal){
+        return journalRepository.existsById(journal.getId());
     }
 
     private Journal convertToEntity(JournalDTO journalDTO) {
