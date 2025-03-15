@@ -1,6 +1,7 @@
 package ru.ivanov.securityserver.services;
 
 import com.fasterxml.uuid.Generators;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -8,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.ivanov.securityserver.dto.PasswordDTO;
 import ru.ivanov.securityserver.dto.Role;
 import ru.ivanov.securityserver.dto.UserDTO;
 import ru.ivanov.securityserver.models.UserEntity;
@@ -81,8 +83,14 @@ public class UserService {
     }
 
     @Transactional
-    public void changePassword(String oldPassword,  String newPassword) {
-        userDetailsRepository.changePassword(oldPassword, newPassword);
+    public void changePassword(PasswordDTO passwordDTO) {
+        String oldPassword = passwordDTO.getOldPassword();
+        String newPassword = passwordDTO.getNewPassword();
+        try {
+            userDetailsRepository.changePassword(oldPassword, newPassword);
+        } catch (AuthenticationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private UserEntity readUserInfo(UUID userId) {

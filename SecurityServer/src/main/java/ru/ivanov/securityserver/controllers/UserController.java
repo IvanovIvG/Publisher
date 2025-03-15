@@ -11,10 +11,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.ivanov.securityserver.dto.PasswordDTO;
 import ru.ivanov.securityserver.dto.Role;
 import ru.ivanov.securityserver.dto.UserDTO;
 import ru.ivanov.securityserver.services.UserService;
-import ru.ivanov.securityserver.valiodators.PasswordValidator;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,7 +28,6 @@ import java.util.UUID;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final PasswordValidator passwordValidator;
 
 
     @Operation(
@@ -128,7 +127,7 @@ public class UserController {
 
     @Operation(
             summary = "Изменить пароль",
-            description = "Меняет пароль пользователя"
+            description = "Меняет пароль аутентифицированного пользователя"
     )
     @ApiResponses(
             value = {
@@ -138,18 +137,12 @@ public class UserController {
                     )
             }
     )
-    @PutMapping(path = "/{userId}/password")
+    @PutMapping(path = "/password")
     @ResponseStatus(HttpStatus.OK)
-    public void changePassword(@PathVariable
-                               @Parameter(description = "id пользователя",
-                                       example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
-                               UUID userId,
-                               @RequestBody
-                               @Schema(description = "новый пароль",
-                                       example = "newSuperSecretPassword")
-                               String newPassword) {
-        passwordValidator.validate(newPassword);
-        userService.changePassword(userId, newPassword);
+    public void changePassword(@RequestBody
+                               @Valid
+                               PasswordDTO passwordDTO) {
+        userService.changePassword(passwordDTO);
     }
 
 
