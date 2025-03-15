@@ -10,8 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ivanov.securityserver.dto.Role;
 import ru.ivanov.securityserver.dto.UserDTO;
-import ru.ivanov.securityserver.dto.UserInfoDTO;
-import ru.ivanov.securityserver.models.UserInfo;
+import ru.ivanov.securityserver.models.UserEntity;
 import ru.ivanov.securityserver.repositories.UserInfoRepository;
 import ru.ivanov.securityserver.utils.UserConverter;
 
@@ -36,103 +35,80 @@ public class UserService {
     }
 
     public List<UserDTO> readAll() {
-        List<UserInfo> allUserInfo = userInfoRepository.findAll();
-        List<UserDetails> allUserDetail = readAllUserDetails(allUserInfo);
-        return userConverter.convertToUserDTOList(allUserDetail, allUserInfo);
+        List<UserEntity> allUserEntity = userInfoRepository.findAll();
+        List<UserDetails> allUserDetail = readAllUserDetails(allUserEntity);
+        return userConverter.convertToUserDTOList(allUserDetail, allUserEntity);
     }
 
     public UserDTO readById(UUID userId) {
-        UserInfo userInfo = readUserInfo(userId);
-        UserDetails userDetails = readUserDetails(userInfo);
-        return userConverter.convertToUserDTO(userInfo, userDetails);
+        UserEntity userEntity = readUserInfo(userId);
+        UserDetails userDetails = readUserDetails(userEntity);
+        return userConverter.convertToUserDTO(userEntity, userDetails);
     }
 
     @Transactional
-    public UserDTO create(UserInfoDTO newUser, String password) {
-        UserInfo newUserInfo = userConverter.convertToUserInfo(newUser);
-        newUserInfo.setId(generateUniqueUserInfoID());
-        newUserInfo = userInfoRepository.save(newUserInfo);
+    public UserDTO create(UserDTO newUser, String password) {
+        UserEntity newUserEntity = userConverter.convertToUserInfo(newUser);
+        newUserEntity.setId(generateUniqueUserInfoID());
+        newUserEntity = userInfoRepository.save(newUserEntity);
 
-        UserDetails newUserDetails = User.withUsername(newUserInfo.getUsername())
+        UserDetails newUserDetails = User.withUsername(newUserEntity.getUsername())
                 .password(password)
                 .authorities("ROLE_READ")
                 .build();
         userDetailsRepository.createUser(newUserDetails);
 
-        return userConverter.convertToUserDTO(newUserInfo, newUserDetails);
-    }
-
-    @Transactional
-    public UserDTO update(UserInfoDTO updatedUser) {
-        UserInfo updatedUserInfo = userConverter.convertToUserInfo(updatedUser);
-        if (userInfoExists(updatedUserInfo)) {
-            updatedUserInfo = userInfoRepository.save(updatedUserInfo);
-        } else {
-            throw  new RuntimeException("There is no user with such id");
-        }
-
-        UserDetails userDetails = readUserDetails(updatedUserInfo);
-        return userConverter.convertToUserDTO(updatedUserInfo, userDetails);
+        return userConverter.convertToUserDTO(newUserEntity, newUserDetails);
     }
 
     @Transactional
     public void deleteUser(UUID userId) {
-        UserInfo userInfo = readUserInfo(userId);
+        UserEntity userEntity = readUserInfo(userId);
 
-        userDetailsRepository.deleteUser(userInfo.getUsername());
+        userDetailsRepository.deleteUser(userEntity.getUsername());
         userInfoRepository.deleteById(userId);
     }
 
     @Transactional
     public UserDTO changeRole(UUID userId, Role newRole) {
-        UserInfo userInfo = readUserInfo(userId);
-        UserDetails userDetails = readUserDetails(userInfo);
-        UserDetails updatedUser = User.withUsername(userDetails.getUsername())
-                .password(userDetails.getPassword())
-                .authorities(newRole::toString)
-                .build();
+        UserEntity userEntity = readUserInfo(userId);
+        UserDetails userDetails = readUserDetails(userEntity);
+        UserDetails updatedUser = new User(userDetails.getUsername(), userDetails.getPassword(), List.of(newRole));
 
         userDetailsRepository.updateUser(updatedUser);
 
-        return userConverter.convertToUserDTO(userInfo, userDetails);
+        return userConverter.convertToUserDTO(userEntity, userDetails);
     }
 
     @Transactional
-    public void changePassword(UUID userId, String newPassword) {
-        UserInfo userInfo = readUserInfo(userId);
-        UserDetails userDetails = readUserDetails(userInfo);
-        UserDetails updatedUser = User.withUsername(userDetails.getUsername())
-                .password(newPassword)
-                .authorities(userDetails.getPassword())
-                .build();
-
-        userDetailsRepository.updateUser(updatedUser);
+    public void changePassword(String oldPassword,  String newPassword) {
+        userDetailsRepository.changePassword(oldPassword, newPassword);
     }
 
-    private UserInfo readUserInfo(UUID userId) {
+    private UserEntity readUserInfo(UUID userId) {
         return userInfoRepository.findById(userId).
                 orElseThrow(() -> new IllegalArgumentException("There is no article with such id"));
     }
 
-    private List<UserDetails> readAllUserDetails(List<UserInfo> allUserInfo) {
+    private List<UserDetails> readAllUserDetails(List<UserEntity> allUserEntity) {
         List<UserDetails> allUserDetail = new ArrayList<>();
-        for (UserInfo userInfo : allUserInfo) {
-            UserDetails userDetails = readUserDetails(userInfo);
+        for (UserEntity userEntity : allUserEntity) {
+            UserDetails userDetails = readUserDetails(userEntity);
             allUserDetail.add(userDetails);
         }
         return allUserDetail;
     }
 
-    private UserDetails readUserDetails(UserInfo userInfo) {
+    private UserDetails readUserDetails(UserEntity userEntity) {
         try {
-            return userDetailsRepository.loadUserByUsername(userInfo.getUsername());
+            return userDetailsRepository.loadUserByUsername(userEntity.getUsername());
         } catch (UsernameNotFoundException e) {
             throw new RuntimeException("User's username in different tables is not the same");
         }
     }
 
-    private boolean userInfoExists(UserInfo UserInfo) {
-        UUID id = UserInfo.getId();
+    private boolean userInfoExists(UserEntity UserEntity) {
+        UUID id = UserEntity.getId();
         return userInfoRepository.existsById(id);
     }
 

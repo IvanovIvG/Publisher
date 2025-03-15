@@ -2,7 +2,7 @@ package ru.ivanov.securityserver.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.ivanov.securityserver.models.UserInfo;
+import ru.ivanov.securityserver.models.UserEntity;
 
 import java.util.UUID;
 
@@ -10,5 +10,5 @@ import java.util.UUID;
  * @author Ivan Ivanov
  **/
 @Repository
-public interface UserInfoRepository extends JpaRepository<UserInfo, UUID> {
+public interface UserInfoRepository extends JpaRepository<UserEntity, UUID> {
 }

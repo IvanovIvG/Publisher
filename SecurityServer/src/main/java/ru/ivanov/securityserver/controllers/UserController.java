@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.ivanov.securityserver.dto.Role;
-import ru.ivanov.securityserver.dto.UserInfoDTO;
 import ru.ivanov.securityserver.dto.UserDTO;
 import ru.ivanov.securityserver.services.UserService;
 import ru.ivanov.securityserver.valiodators.PasswordValidator;
@@ -91,35 +90,11 @@ public class UserController {
     )
     @PostMapping(produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDTO createUser(@RequestBody @Valid UserInfoDTO newUser) {
+    public UserDTO createUser(@RequestBody @Valid UserDTO newUser) {
         newUser.setId(null);
+        newUser.setRole(Role.ROLE_READ);
         String password = "password";
         return userService.create(newUser, password);
-    }
-
-
-    @Operation(
-            summary = "Изменить пользователя",
-            description = "Обновляет информацию о пользователе, не влияющую на работу приложения"
-    )
-    @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    schema = @Schema(implementation = UserDTO.class)),
-                            description = "Пользователь изменен"
-                    )
-            }
-    )
-    @PutMapping(path = "/{userId}", produces = "application/json")
-    public UserDTO updateUser(@PathVariable
-                              @Parameter(description = "id пользователя",
-                                      example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
-                              UUID userId,
-                              @RequestBody @Valid UserInfoDTO updatedUser) {
-        updatedUser.setId(userId);
-        return userService.update(updatedUser);
     }
 
 

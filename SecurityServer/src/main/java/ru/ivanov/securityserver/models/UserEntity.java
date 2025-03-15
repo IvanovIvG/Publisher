@@ -16,7 +16,7 @@ import java.util.UUID;
 @Table(name = "user_info")
 @Data
 @NoArgsConstructor
-public class UserInfo {
+public class UserEntity {
     @Id
     @Column(name = "id")
     private UUID id;
