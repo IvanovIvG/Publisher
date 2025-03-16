@@ -32,6 +32,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.sql.DataSource;
 import java.security.KeyPair;
@@ -40,6 +42,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -71,12 +74,25 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(c -> {
+                    CorsConfigurationSource source = request -> {
+                        CorsConfiguration config = new CorsConfiguration();
+                        config.setAllowedOrigins(
+                                List.of("http://localhost:3000"));
+                        config.setAllowedMethods(
+                                List.of("*"));
+                        config.setAllowedHeaders(List.of("*"));
+                        return config;
+                    };
+                    c.configurationSource(source);
+                })
                 .authorizeHttpRequests((authorize) -> authorize
-                                .anyRequest().authenticated()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) ->
                         oauth2.jwt(jwt -> jwt
-                                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                 )
                 .formLogin(Customizer.withDefaults());

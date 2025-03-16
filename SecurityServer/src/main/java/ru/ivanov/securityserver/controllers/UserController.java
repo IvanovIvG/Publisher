@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +47,7 @@ public class UserController {
             }
     )
     @GetMapping(produces = "application/json")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> showAllUsers() {
         return userService.readAll();
     }
@@ -66,6 +68,7 @@ public class UserController {
             }
     )
     @GetMapping(path = "/{userId}", produces = "application/json")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserDTO showUser(@PathVariable
                             @Parameter(description = "id пользователя",
                                     example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
@@ -90,6 +93,7 @@ public class UserController {
     )
     @PostMapping(produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public UserDTO createUser(@RequestBody @Valid UserDTO newUser) {
         newUser.setId(null);
         newUser.setRole(() -> "ROLE_READ");
@@ -113,6 +117,7 @@ public class UserController {
             }
     )
     @PutMapping(path = "/{userId}/role")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserDTO changeRole(@PathVariable
                               @Parameter(description = "id пользователя",
                                       example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
@@ -161,6 +166,7 @@ public class UserController {
     )
     @DeleteMapping(path = "/{userId}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(@PathVariable
                            @Parameter(description = "id пользователя",
                                    example = "01950a0f-e717-7193-8e4c-fa9baedd9874")
