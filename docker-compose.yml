@@ -8,7 +8,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - database
+      - backend_database
     environment:
       - SERVER_PORT= 8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://database/publisher
@@ -21,17 +21,30 @@ services:
       - "9090:9090"
     environment:
       - SERVER_PORT= 9090
-  database:
+  backend_database:
     image: postgres:14.7-alpine
-    container_name: database
+    container_name: backend_database
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: PathNotFind
     ports:
       - "5432:5432"
     volumes:
-      - ./infrastructure/db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
-      - db-data:/var/lib/postgresql/data
+      - ./infrastructure/backend_db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
+      - backend_database_data:/var/lib/postgresql/data
+    restart: unless-stopped
+  security_database:
+    image: postgres:14.7-alpine
+    container_name: security_database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: PathNotFind
+    ports:
+      - "5430:5432"
+    volumes:
+      - ./infrastructure/security_db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
+      - security_database_data:/var/lib/postgresql/data
     restart: unless-stopped
 volumes:
-  db-data:
+  backend_database_data:
+  security_database_data:
