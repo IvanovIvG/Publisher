@@ -89,7 +89,7 @@ public class UserService {
         try {
             userDetailsRepository.changePassword(oldPassword, newPassword);
         } catch (AuthenticationException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException("Wrong password");
         }
     }
 
@@ -113,11 +113,6 @@ public class UserService {
         } catch (UsernameNotFoundException e) {
             throw new RuntimeException("User's username in different tables is not the same");
         }
-    }
-
-    private boolean userInfoExists(UserEntity UserEntity) {
-        UUID id = UserEntity.getId();
-        return userInfoRepository.existsById(id);
     }
 
     private UUID generateUniqueUserInfoID() {
