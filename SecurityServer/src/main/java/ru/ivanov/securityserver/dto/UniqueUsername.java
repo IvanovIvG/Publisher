@@ -1,7 +1,7 @@
 package ru.ivanov.securityserver.dto;
 
 import jakarta.validation.Constraint;
-import ru.ivanov.securityserver.validators.UsernameValidator;
+import ru.ivanov.securityserver.utils.UsernameValidator;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

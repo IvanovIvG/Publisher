@@ -1,4 +1,4 @@
-package ru.ivanov.securityserver.validators;
+package ru.ivanov.securityserver.utils;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

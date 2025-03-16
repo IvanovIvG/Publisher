@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.UUID;
 
@@ -25,5 +26,5 @@ public class UserDTO {
     private String username;
 
     @Schema(description = "Права пользователя", example = "ROLE_ADMIN")
-    private Role role;
+    private GrantedAuthority role;
 }

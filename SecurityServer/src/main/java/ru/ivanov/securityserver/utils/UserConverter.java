@@ -1,10 +1,17 @@
 package ru.ivanov.securityserver.utils;
 
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.Converter;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import ru.ivanov.securityserver.dto.UserDTO;
 import ru.ivanov.securityserver.models.UserEntity;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,16 +20,34 @@ import java.util.List;
  **/
 @Component
 public class UserConverter {
-    public List<UserDTO> convertToUserDTOList(List<UserDetails> allUserDetail, List<UserEntity> allUserEntity) {
-        return Collections.emptyList();
+    private  final ModelMapper modelMapper;
+
+    public UserConverter(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
+
+    public List<UserDTO> convertToUserDTOList(List<UserEntity> allUserEntity, List<UserDetails> allUserDetail) {
+        List<UserDTO> userDTOList = new ArrayList<>();
+        for (int i = 0; i < allUserDetail.size(); i++) {
+            UserDTO userDTO = convertToUserDTO(allUserEntity.get(i), allUserDetail.get(i));
+            userDTOList.add(userDTO);
+        }
+        return userDTOList;
     }
 
     public UserDTO convertToUserDTO(UserEntity userEntity, UserDetails userDetails) {
-        return null;
+        TypeMap<UserDetails, UserDTO> detailsToDTOMap = modelMapper.createTypeMap(UserDetails.class, UserDTO.class);
+        Converter<Collection<GrantedAuthority>, GrantedAuthority> collectionToGrantedAuthority =
+                c -> c.getSource().stream().toList().get(0);
+        detailsToDTOMap.addMappings(mapper ->
+                mapper.using(collectionToGrantedAuthority).map(UserDetails::getAuthorities, UserDTO::setRole));
+
+        UserDTO userDTO = modelMapper.map(userEntity, UserDTO.class);
+        detailsToDTOMap.map(userDetails, userDTO);
+        return userDTO;
     }
 
-    public UserEntity convertToUserInfo(UserDTO newUser) {
-
-        return null;
+    public UserEntity convertToUserInfo(UserDTO userDTO) {
+        return modelMapper.map(userDTO, UserEntity.class);
     }
 }

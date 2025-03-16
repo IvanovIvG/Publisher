@@ -10,9 +10,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import ru.ivanov.securityserver.dto.PasswordDTO;
-import ru.ivanov.securityserver.dto.Role;
 import ru.ivanov.securityserver.dto.UserDTO;
 import ru.ivanov.securityserver.services.UserService;
 
@@ -91,7 +91,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO createUser(@RequestBody @Valid UserDTO newUser) {
         newUser.setId(null);
-        newUser.setRole(Role.ROLE_READ);
+        newUser.setRole(() -> "ROLE_READ");
         String password = "password";
         return userService.create(newUser, password);
     }
@@ -120,7 +120,7 @@ public class UserController {
                               @Schema(description = "Новое право доступа пользователя",
                                       example = "ROLE_READ"
                               )
-                              Role newRole) {
+                              GrantedAuthority newRole) {
         return userService.changeRole(userId, newRole);
     }
 

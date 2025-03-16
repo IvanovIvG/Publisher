@@ -2,6 +2,7 @@ package ru.ivanov.securityserver.services;
 
 import com.fasterxml.uuid.Generators;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,7 +11,6 @@ import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ivanov.securityserver.dto.PasswordDTO;
-import ru.ivanov.securityserver.dto.Role;
 import ru.ivanov.securityserver.dto.UserDTO;
 import ru.ivanov.securityserver.models.UserEntity;
 import ru.ivanov.securityserver.repositories.UserInfoRepository;
@@ -39,7 +39,7 @@ public class UserService {
     public List<UserDTO> readAll() {
         List<UserEntity> allUserEntity = userInfoRepository.findAll();
         List<UserDetails> allUserDetail = readAllUserDetails(allUserEntity);
-        return userConverter.convertToUserDTOList(allUserDetail, allUserEntity);
+        return userConverter.convertToUserDTOList(allUserEntity, allUserDetail);
     }
 
     public UserDTO readById(UUID userId) {
@@ -72,7 +72,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO changeRole(UUID userId, Role newRole) {
+    public UserDTO changeRole(UUID userId, GrantedAuthority newRole) {
         UserEntity userEntity = readUserInfo(userId);
         UserDetails userDetails = readUserDetails(userEntity);
         UserDetails updatedUser = new User(userDetails.getUsername(), userDetails.getPassword(), List.of(newRole));
