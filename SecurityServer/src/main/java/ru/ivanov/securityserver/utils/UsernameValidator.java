@@ -37,6 +37,8 @@ public class UsernameValidator implements ConstraintValidator<UniqueUsername, Us
 
     private boolean theyHaveSameId(UserDTO user, UserDTO userWithSameUsername) {
         UUID userId = user.getId();
+        if(userId == null)
+            return false;
         UUID userWithSameUsernameId = userWithSameUsername.getId();
         return userId.equals(userWithSameUsernameId);
     }

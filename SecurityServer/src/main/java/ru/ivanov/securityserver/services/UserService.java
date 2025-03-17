@@ -56,7 +56,7 @@ public class UserService {
 
         UserDetails newUserDetails = User.withUsername(newUserEntity.getUsername())
                 .password(password)
-                .authorities("ROLE_READ")
+                .authorities("ROLE_USER")
                 .build();
         userDetailsRepository.createUser(newUserDetails);
 

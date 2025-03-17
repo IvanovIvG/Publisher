@@ -1,6 +1,7 @@
 package ru.ivanov.securityserver.dto;
 
 import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 import ru.ivanov.securityserver.utils.UsernameValidator;
 
 import java.lang.annotation.Documented;
@@ -19,4 +20,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface UniqueUsername {
     String message() default "Username must be unique";
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
 }

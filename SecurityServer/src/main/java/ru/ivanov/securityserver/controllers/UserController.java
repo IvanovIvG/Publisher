@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import ru.ivanov.securityserver.dto.PasswordDTO;
 import ru.ivanov.securityserver.dto.UserDTO;
@@ -96,7 +97,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public UserDTO createUser(@RequestBody @Valid UserDTO newUser) {
         newUser.setId(null);
-        newUser.setRole(() -> "ROLE_READ");
+        newUser.setRole(new SimpleGrantedAuthority("ROLE_USER"));
         String password = "password";
         return userService.create(newUser, password);
     }
@@ -124,7 +125,7 @@ public class UserController {
                               UUID userId,
                               @RequestBody
                               @Schema(description = "Новое право доступа пользователя",
-                                      example = "ROLE_READ"
+                                      example = "ROLE_USER"
                               )
                               GrantedAuthority newRole) {
         return userService.changeRole(userId, newRole);
