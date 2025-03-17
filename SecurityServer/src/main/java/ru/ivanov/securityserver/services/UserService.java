@@ -95,7 +95,7 @@ public class UserService {
 
     private UserEntity readUserInfo(UUID userId) {
         return userInfoRepository.findById(userId).
-                orElseThrow(() -> new IllegalArgumentException("There is no article with such id"));
+                orElseThrow(() -> new IllegalArgumentException("There is no user with such id"));
     }
 
     private List<UserDetails> readAllUserDetails(List<UserEntity> allUserEntity) {

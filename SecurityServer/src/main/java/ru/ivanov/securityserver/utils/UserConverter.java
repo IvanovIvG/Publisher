@@ -18,28 +18,32 @@ import java.util.List;
  **/
 @Component
 public class UserConverter {
-    private  final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
+    private final TypeMap<UserDetails, UserDTO> detailsToDTOMap;
 
     public UserConverter(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
+        this.detailsToDTOMap = modelMapper.createTypeMap(UserDetails.class, UserDTO.class);
+        Converter<Collection<GrantedAuthority>, GrantedAuthority> collectionToGrantedAuthority =
+                c -> c.getSource().stream().toList().get(0);
+        detailsToDTOMap.addMappings(mapper ->
+                mapper.using(collectionToGrantedAuthority).map(UserDetails::getAuthorities, UserDTO::setRole));
+
     }
 
     public List<UserDTO> convertToUserDTOList(List<UserEntity> allUserEntity, List<UserDetails> allUserDetail) {
         List<UserDTO> userDTOList = new ArrayList<>();
-        for (int i = 0; i < allUserDetail.size(); i++) {
-            UserDTO userDTO = convertToUserDTO(allUserEntity.get(i), allUserDetail.get(i));
+        for(UserEntity userEntity:allUserEntity){
+            String username = userEntity.getUsername();
+            UserDetails userDetail = allUserDetail.stream().filter(user -> user.getUsername().equals(username))
+                    .toList().get(0);
+            UserDTO userDTO = convertToUserDTO(userEntity, userDetail);
             userDTOList.add(userDTO);
         }
         return userDTOList;
     }
 
     public UserDTO convertToUserDTO(UserEntity userEntity, UserDetails userDetails) {
-        TypeMap<UserDetails, UserDTO> detailsToDTOMap = modelMapper.createTypeMap(UserDetails.class, UserDTO.class);
-        Converter<Collection<GrantedAuthority>, GrantedAuthority> collectionToGrantedAuthority =
-                c -> c.getSource().stream().toList().get(0);
-        detailsToDTOMap.addMappings(mapper ->
-                mapper.using(collectionToGrantedAuthority).map(UserDetails::getAuthorities, UserDTO::setRole));
-
         UserDTO userDTO = modelMapper.map(userEntity, UserDTO.class);
         detailsToDTOMap.map(userDetails, userDTO);
         return userDTO;
