@@ -30,7 +30,7 @@ public class JournalDTO {
     @Schema(description = "Номер журнала", example = "01/25")
     @JsonProperty("номер")
     @Pattern(regexp = "^\\d{2,}/\\d{2,}$", message = "Number must be in 01/25 format")
-    @NotBlank(message = "Name must not be empty", groups = OnCreate.class)
+    @NotBlank(message = "Journal number must not be empty", groups = OnCreate.class)
     private String journalNumber;
 
     @Schema(description = "Должно ли поле id статьи показываться", example = "true")

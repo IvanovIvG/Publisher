@@ -11,7 +11,9 @@ services:
       - backend_database
     environment:
       - SERVER_PORT= 8080
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://database/publisher
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://backend_database:5432/publisher
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=PathNotFind
   security:
     image: security:0.1.0
     container_name: security
@@ -19,8 +21,13 @@ services:
       context: ./SecurityServer
     ports:
       - "9090:9090"
+    depends_on:
+      - security_database
     environment:
       - SERVER_PORT= 9090
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://security_database:5430/security
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=PathNotFind
   backend_database:
     image: postgres:14.7-alpine
     container_name: backend_database
@@ -39,11 +46,14 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: PathNotFind
+    expose:
+      - "5430"
     ports:
-      - "5430:5432"
+      - "5430:5430"
     volumes:
       - ./infrastructure/security_db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
       - security_database_data:/var/lib/postgresql/data
+    command: -p 5430
     restart: unless-stopped
 volumes:
   backend_database_data:
