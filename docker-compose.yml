@@ -14,6 +14,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://backend_database:5432/publisher
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=PathNotFind
+      - keySetURI=http://security:9090/oauth2/jwks
   security:
     image: security:0.1.0
     container_name: security
@@ -37,7 +38,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./infrastructure/backend_db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
+      - ./.databases/backend_db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
       - backend_database_data:/var/lib/postgresql/data
     restart: unless-stopped
   security_database:
@@ -51,7 +52,7 @@ services:
     ports:
       - "5430:5430"
     volumes:
-      - ./infrastructure/security_db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
+      - ./.databases/security_db/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
       - security_database_data:/var/lib/postgresql/data
     command: -p 5430
     restart: unless-stopped

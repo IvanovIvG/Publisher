@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,7 @@ public class UserController {
             }
     )
     @GetMapping(produces = "application/json")
+    @SecurityRequirement(name = "JWT")
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> showAllUsers() {
         return userService.readAll();
@@ -69,6 +71,7 @@ public class UserController {
             }
     )
     @GetMapping(path = "/{userId}", produces = "application/json")
+    @SecurityRequirement(name = "JWT")
     @PreAuthorize("hasRole('ADMIN')")
     public UserDTO showUser(@PathVariable
                             @Parameter(description = "id пользователя",
@@ -93,6 +96,7 @@ public class UserController {
             }
     )
     @PostMapping(produces = "application/json")
+    @SecurityRequirement(name = "JWT")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
     public UserDTO createUser(@RequestBody @Valid UserDTO newUser) {
@@ -118,6 +122,7 @@ public class UserController {
             }
     )
     @PutMapping(path = "/{userId}/role")
+    @SecurityRequirement(name = "JWT")
     @PreAuthorize("hasRole('ADMIN')")
     public UserDTO changeRole(@PathVariable
                               @Parameter(description = "id пользователя",
@@ -127,7 +132,9 @@ public class UserController {
                               @Schema(description = "Новое право доступа пользователя",
                                       example = "ROLE_USER"
                               )
-                              GrantedAuthority newRole) {
+                              String newRoleString) {
+        newRoleString = newRoleString.replaceAll("[^A-Za-z_0-9]", "");
+        GrantedAuthority newRole = new SimpleGrantedAuthority(newRoleString);
         return userService.changeRole(userId, newRole);
     }
 
@@ -145,6 +152,7 @@ public class UserController {
             }
     )
     @PutMapping(path = "/password")
+    @SecurityRequirement(name = "JWT")
     @ResponseStatus(HttpStatus.OK)
     public void changePassword(@RequestBody
                                @Valid
@@ -166,6 +174,7 @@ public class UserController {
             }
     )
     @DeleteMapping(path = "/{userId}")
+    @SecurityRequirement(name = "JWT")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteUser(@PathVariable

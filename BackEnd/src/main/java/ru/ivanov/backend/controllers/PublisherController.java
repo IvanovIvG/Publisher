@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,7 @@ public class PublisherController {
             }
     )
     @GetMapping(produces = "application/json")
+    @SecurityRequirement(name = "JWT")
     public List<JournalDTO> showAllJournals() {
         return journalService.readAll();
     }
@@ -79,6 +81,7 @@ public class PublisherController {
             }
     )
     @PostMapping(produces = "application/json")
+    @SecurityRequirement(name = "JWT")
     @ResponseStatus(HttpStatus.CREATED)
     @Validated(OnCreate.class)
     public JournalDTO createJournal(@RequestBody @Valid JournalDTO newJournal) {
@@ -115,6 +118,7 @@ public class PublisherController {
             }
     )
     @PutMapping(path = "/{journalId}", produces = "application/json")
+    @SecurityRequirement(name = "JWT")
     @Validated(OnUpdate.class)
     public JournalDTO updateJournal(@RequestBody @Valid JournalDTO journalToUpdate,
                                     @Parameter(description = "id изменяемого журнала",
@@ -138,6 +142,7 @@ public class PublisherController {
             }
     )
     @DeleteMapping("/{journalId}")
+    @SecurityRequirement(name = "JWT")
     @ResponseStatus(HttpStatus.OK)
     public void deleteJournal(@PathVariable("journalId")
                               @Parameter(description = "id удаляемого журнала",

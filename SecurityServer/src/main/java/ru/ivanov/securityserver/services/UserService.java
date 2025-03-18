@@ -79,7 +79,7 @@ public class UserService {
 
         userDetailsRepository.updateUser(updatedUser);
 
-        return userConverter.convertToUserDTO(userEntity, userDetails);
+        return userConverter.convertToUserDTO(userEntity, updatedUser);
     }
 
     @Transactional
