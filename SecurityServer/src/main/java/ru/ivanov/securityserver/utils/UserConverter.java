@@ -6,6 +6,7 @@ import org.modelmapper.TypeMap;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import ru.ivanov.securityserver.dto.Role;
 import ru.ivanov.securityserver.dto.UserDTO;
 import ru.ivanov.securityserver.models.UserEntity;
 
@@ -24,8 +25,8 @@ public class UserConverter {
     public UserConverter(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
         this.detailsToDTOMap = modelMapper.createTypeMap(UserDetails.class, UserDTO.class);
-        Converter<Collection<GrantedAuthority>, GrantedAuthority> collectionToGrantedAuthority =
-                c -> c.getSource().stream().toList().get(0);
+        Converter<Collection<GrantedAuthority>, Role> collectionToGrantedAuthority =
+                c -> new Role(c.getSource().stream().toList().get(0).getAuthority());
         detailsToDTOMap.addMappings(mapper ->
                 mapper.using(collectionToGrantedAuthority).map(UserDetails::getAuthorities, UserDTO::setRole));
 

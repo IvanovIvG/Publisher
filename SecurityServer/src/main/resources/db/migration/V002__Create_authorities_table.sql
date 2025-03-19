@@ -6,3 +6,4 @@ create table authorities
 
 insert into authorities (username, authority) values ('user', 'ROLE_USER');
 insert into authorities (username, authority) values ('admin', 'ROLE_ADMIN');
+insert into authorities (username, authority) values ('bob', 'ROLE_ADMIN');

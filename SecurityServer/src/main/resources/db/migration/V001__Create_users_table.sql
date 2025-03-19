@@ -7,3 +7,5 @@ create table users
 
 insert into users (username, password, enabled) values ('user', 'qwerty', 'true');
 insert into users (username, password, enabled) values ('admin', 'qwerty', 'true');
+insert into users (username, password, enabled) values ('bob', 'abc', 'true');
+

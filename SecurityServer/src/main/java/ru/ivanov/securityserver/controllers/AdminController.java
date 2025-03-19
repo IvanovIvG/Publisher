@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import ru.ivanov.securityserver.dto.Role;
 import ru.ivanov.securityserver.dto.UserCreationDTO;
 import ru.ivanov.securityserver.dto.UserDTO;
 import ru.ivanov.securityserver.dto.errors.NotFoundError;
@@ -113,7 +114,7 @@ public class AdminController {
     public UserDTO createUser(@RequestBody @Valid UserCreationDTO userCreationDTO) {
         UserDTO newUser = userCreationDTO.getUserDTO();
         newUser.setId(null);
-        newUser.setRole(new SimpleGrantedAuthority("ROLE_USER"));
+        newUser.setRole(new Role("ROLE_USER"));
         String password = userCreationDTO.getPassword();
         return userService.create(newUser, password);
     }

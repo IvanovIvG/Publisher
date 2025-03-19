@@ -26,5 +26,5 @@ public class UserDTO {
     private String username;
 
     @Schema(description = "Права пользователя", example = "ROLE_ADMIN")
-    private GrantedAuthority role;
+    private Role role;
 }

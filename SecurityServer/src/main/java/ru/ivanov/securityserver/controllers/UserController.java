@@ -75,6 +75,12 @@ public class UserController {
                     @ApiResponse(
                             responseCode = "200",
                             description = "Пароль пользователя изменен"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            content = @Content(
+                                    schema = @Schema(implementation = ValidationError.class)),
+                            description = "Ошибка валидации"
                     )
             }
     )
