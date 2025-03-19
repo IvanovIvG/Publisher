@@ -1,11 +1,12 @@
 FROM openjdk:23-jdk AS builder
-COPY ../.mvn .mvn
-COPY ../mvnw pom.xml ./
+COPY ../BackEnd/.mvn .mvn
+COPY ../BackEnd/mvnw ../BackEnd/pom.xml ./
 RUN ./mvnw dependency:go-offline
-COPY ./src ./src
+COPY ./BackEnd/src ./src
 RUN ./mvnw clean install -DskipTests
 
 FROM openjdk:23-jdk
 COPY --from=builder target/*.jar *.jar
+COPY ../.env .env
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "*.jar"]
