@@ -43,7 +43,13 @@ public class UserService {
     }
 
     public UserDTO readById(UUID userId) {
-        UserEntity userEntity = readUserInfo(userId);
+        UserEntity userEntity = readUserEntityById(userId);
+        UserDetails userDetails = readUserDetails(userEntity);
+        return userConverter.convertToUserDTO(userEntity, userDetails);
+    }
+
+    public UserDTO readByUserName(String username) {
+        UserEntity userEntity = readUserEntityByUsername(username);
         UserDetails userDetails = readUserDetails(userEntity);
         return userConverter.convertToUserDTO(userEntity, userDetails);
     }
@@ -65,7 +71,7 @@ public class UserService {
 
     @Transactional
     public void deleteUser(UUID userId) {
-        UserEntity userEntity = readUserInfo(userId);
+        UserEntity userEntity = readUserEntityById(userId);
 
         userDetailsRepository.deleteUser(userEntity.getUsername());
         userInfoRepository.deleteById(userId);
@@ -73,7 +79,7 @@ public class UserService {
 
     @Transactional
     public UserDTO changeRole(UUID userId, GrantedAuthority newRole) {
-        UserEntity userEntity = readUserInfo(userId);
+        UserEntity userEntity = readUserEntityById(userId);
         UserDetails userDetails = readUserDetails(userEntity);
         UserDetails updatedUser = new User(userDetails.getUsername(), userDetails.getPassword(), List.of(newRole));
 
@@ -93,9 +99,14 @@ public class UserService {
         }
     }
 
-    private UserEntity readUserInfo(UUID userId) {
+    private UserEntity readUserEntityById(UUID userId) {
         return userInfoRepository.findById(userId).
                 orElseThrow(() -> new IllegalArgumentException("There is no user with such id"));
+    }
+
+    private UserEntity readUserEntityByUsername(String username) {
+        return userInfoRepository.findByUsername(username).
+                orElseThrow(() -> new IllegalArgumentException("There is no user with such username"));
     }
 
     private List<UserDetails> readAllUserDetails(List<UserEntity> allUserEntity) {

@@ -10,10 +10,9 @@ services:
     depends_on:
       - backend_database
     environment:
-      - SERVER_PORT= 8080
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://backend_database:5432/publisher
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=PathNotFind
+      - spring.datasource.url=jdbc:postgresql://backend_database:5432/publisher
+      - spring.datasource.username=postgres
+      - spring.datasource.password=PathNotFind
       - keySetURI=http://security:9090/oauth2/jwks
   security:
     image: security:0.1.0
@@ -33,8 +32,8 @@ services:
     image: postgres:14.7-alpine
     container_name: backend_database
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: PathNotFind
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
     volumes:
