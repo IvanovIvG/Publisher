@@ -87,7 +87,7 @@ public class SecurityConfig {
                     c.configurationSource(source);
                 })
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/doc/**", "/swagger-ui/**","api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) ->
@@ -117,12 +117,12 @@ public class SecurityConfig {
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("client")
-                .clientSecret("secret")
+                .clientId("frontend")
+                .clientSecret("frontSecret")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("https://www.manning.com/authorized")
+                .redirectUri("https://localhost:3000/authorized")
                 .scope(OidcScopes.OPENID)
                 .build();
 

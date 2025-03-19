@@ -4,36 +4,38 @@ services:
     image: backend:0.1.0
     container_name: backend
     build:
-      context: ./BackEnd
+      context: .
+      dockerfile: BackEnd/Dockerfile
     ports:
       - "8080:8080"
     depends_on:
       - backend_database
     environment:
-      - spring.datasource.url=jdbc:postgresql://backend_database:5432/publisher
-      - spring.datasource.username=postgres
-      - spring.datasource.password=PathNotFind
-      - keySetURI=http://security:9090/oauth2/jwks
+      spring.datasource.url: jdbc:postgresql://backend_database:5432/publisher
+      spring.datasource.username: ${BACKEND_DB_USERNAME}
+      spring.datasource.password: ${BACKEND_DB_PASSWORD}
+      keySetURI: http://security:9090/oauth2/jwks
   security:
     image: security:0.1.0
     container_name: security
     build:
-      context: ./SecurityServer
+      context: .
+      dockerfile: SecurityServer/Dockerfile
     ports:
       - "9090:9090"
     depends_on:
       - security_database
     environment:
-      - SERVER_PORT= 9090
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://security_database:5430/security
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=PathNotFind
+      SPRING_DATASOURCE_URL: jdbc:postgresql://security_database:5430/security
+      SPRING_DATASOURCE_USERNAME: ${SECURITY_DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SECURITY_DB_PASSWORD}
   backend_database:
     image: postgres:14.7-alpine
     container_name: backend_database
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: ${BACKEND_DB_USERNAME}
+      POSTGRES_PASSWORD: ${BACKEND_DB_PASSWORD}
+      POSTGRES_DB: publisher
     ports:
       - "5432:5432"
     volumes:
@@ -44,8 +46,9 @@ services:
     image: postgres:14.7-alpine
     container_name: security_database
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: PathNotFind
+      POSTGRES_USER: ${SECURITY_DB_USERNAME}
+      POSTGRES_PASSWORD: ${SECURITY_DB_PASSWORD}
+      POSTGRES_DB: security
     expose:
       - "5430"
     ports:

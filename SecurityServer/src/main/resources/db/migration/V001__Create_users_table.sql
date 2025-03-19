@@ -5,5 +5,5 @@ create table users
     enabled  boolean  not null
 );
 
-insert into users (username, password, enabled) values ('john', '12345', 'true');
-insert into users (username, password, enabled) values ('bob', 'abc', 'true');
+insert into users (username, password, enabled) values ('user', 'qwerty', 'true');
+insert into users (username, password, enabled) values ('admin', 'qwerty', 'true');
